@@ -8,7 +8,7 @@ def get_theme():
         print('Get questions for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
     con = get_connection()
     cursor = con.cursor()
-    theme = cursor.callfunc("testing.get_theme", str, [g.user.id_user])
+    theme = cursor.callfunc("test.get_theme", str, [g.user.id_user])
     print("Got theme: "+theme)
     cursor.close()
     con.close()
@@ -20,7 +20,20 @@ def get_quest():
         print('Get questions for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
     con = get_connection()
     cursor = con.cursor()
-    question = cursor.callfunc("testing.get_question", str, [g.user.id_user])
+    question = cursor.callfunc("test.get_question", str, [g.user.id_user])
+    print("Got question: "+question)
+    cursor.close()
+    con.close()
+    return question
+
+
+def get_answers():
+    if cfg.debug_level > 1:
+        print('Get answer for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
+    con = get_connection()
+    cursor = con.cursor()
+    cmd = "select id_answer, answer from answers a where "
+    question = cursor.callfunc("test.get_question", str, [g.user.id_user])
     print("Got question: "+question)
     cursor.close()
     con.close()
