@@ -1,0 +1,47 @@
+{% extends 'base_testing.html' %}
+
+{% block title %}
+    {{ res_value('APP_NAME') }}
+{% endblock %}
+
+{% block main_title %}
+    <h1 class="title">{{ theme }}</h1>
+{% endblock %}
+
+{% block command %}
+    <input class="bt nav" type="submit" value="{{ res_value('FIRST_QUESTION') }}">
+    <input class="bt nav" type="submit" value="{{ res_value('PREV_QUESTION') }}">
+    <input class="bt nav" type="submit" value="{{ res_value('SAVE_ANSWER') }}">
+    <input class="bt nav" type="submit" value="{{ res_value('NEXT_QUESTION') }}">
+    <input class="bt nav" type="submit" value="{{ res_value('LAST_QUESTION') }}">
+{% endblock %}
+
+{% block body %}
+<form class="form_register" method="POST">
+    <p class="question">{{ question }}</p>
+    <div>
+<!--    <table>-->
+<!--        <tr>-->
+            <br>
+            <input name="select" type="radio" id="first_answer"  value="1">
+            <label for="first_answer" class="answer">12</label>
+<!--        </tr>-->
+<!--        <tr>-->
+            <br><br>
+            <input name="select" type="radio" id="second_answer"  value="2">
+            <label for="second_answer" class="answer">13</label>
+<!--        </tr>-->
+<!--        <tr>-->
+            <br><br>
+            <input name="select" type="radio" id="third_answer"  value="3" >
+            <label for="third_answer" class="answer">14</label>
+<!--        </tr>-->
+<!--        <tr>-->
+            <br><br>
+            <input name="select" type="radio"  id="fourth_answer"  value="4">
+            <label for="fourth_answer" class="answer">15</label>
+    </div>
+<!--        </tr>-->
+<!--    </table>-->
+</form>
+{% endblock %}

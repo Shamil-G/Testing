@@ -1,0 +1,11 @@
+APP_NAME = Тестирование
+FIRST_QUESTION = <<  В начало
+INSERT_IIN = ИИН:
+INVITE_TO_TESTING =  Для перехода к тестированию
+LAST_QUESTION = В конец  >>
+NEXT_QUESTION =  Следующий  >
+PASSWORD = Пароль:
+PREV_QUESTION = <  Предыдущий
+REGISTER_NEW_EMPLOYEE = Регистрация пользователя перед началом тестирования
+START_TEST = Начать тестирование
+SAVE_ANSWER = Сохранить

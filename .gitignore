@@ -1,0 +1,4 @@
+.idea/
+venv/
+reports/spool/
+*__pycache__/

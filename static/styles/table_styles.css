@@ -1,0 +1,113 @@
+.question{
+    margin: 5px;
+    padding: 10px;
+    color: var(--base-color-text);
+    font-weight: bold;
+    width: 100%;
+    border-bottom: 2px solid rgba(0, 47, 189, 0.3);
+}
+.answer{
+    margin: 20px;
+    padding: 10px;
+    color: var(--base-color-text);
+    font-weight: normal;
+    width: 100%;
+}
+.title, .title2 {
+    padding: 4px;
+    margin-left: 5px;
+    color: var(--base-color-text);
+    font-weight: bold;
+}
+.title, .question{
+    font-size: 20px;
+}
+.title2 {
+    font-size: 16px;
+}
+/* Форма ABOUT*/
+.table_about, .table_model_status
+{
+    margin: 12px;
+    border-collapse: collapse;
+}
+.table_about caption{
+    padding: 12px;
+    text-align: left;
+    font-family: Lobster, cursive;
+}
+.table_about th, .table_about tr, .table_about td
+{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 12px;
+}
+.table_model_status th, .table_model_status tbody tr, .table_model_status tbody td
+{
+    padding: 3px 12px;
+    text-align: center;
+}
+/* Делаем границы таблиц*/
+.table_about caption, .table_about th, .table_about tr, .table_about td,
+.table_model_status th, .table_model_status tbody tr, .table_model_status tbody td
+{
+    border-radius: 5px;
+    border: 1px solid rgba(0, 47, 189, 0.3);
+}
+/* Подсвечиваем строки на котором стоит курсор*/
+.table_model_status tbody tr:hover, .table_about tr:hover{
+    background-color: rgba(239, 220, 112, 0.15);
+}
+/* Цвет ячеек по которым отчет еще не сформирован */
+.table_model_status .report_empty
+{
+    color: saddlebrown;
+    /*font-family: Comic Sans Ms, sans-serif;*/
+}
+/* Подкрашиваем кнопку Новый расчет и линки на отчеты*/
+.new_calc_ref, .table_model_status .get_report:link
+{
+    color: rgba(0, 47, 189, 1);
+    text-decoration: none;
+}
+.table_model_status a[name='sum_column']{
+    margin-left: 5px;
+    margin-right: 5px;
+}
+/*  При выделении мышкой увеличиваем толщин шрифта */
+.new_calc_ref:hover
+{
+    color: rgb(28, 170, 53);
+    font-weight: bolder;
+    text-decoration: none;
+    /*font-family: Comic Sans Ms, sans-serif;*/
+}
+.new_calc_ref:hover
+{
+    /*color: rgba(0, 47, 189, 1);*/
+    font-weight: bolder;
+    /*font-family: Comic Sans Ms, sans-serif;*/
+}
+/* Если отчет выбирали то установим новый цвет */
+.table_model_status .get_report:visited,
+.table_model_status .get_report:hover
+{
+    color: rgb(28, 170, 53);
+    font-weight: bolder;
+    /*text-decoration: none;*/
+    /*font-family: Comic Sans Ms, sans-serif;*/
+}
+.table_model_status .command-del:link{
+    /*color: #002e8b;*/
+    color: #763a12;
+    text-decoration: none;
+    font-weight: bold;
+}
+.table_model_status .command-del:hover {
+    color: #ba2020;
+    font-weight: bold;
+}
+*, *:after, *:before {
+    box-sizing: border-box;
+}
+

@@ -1,0 +1,40 @@
+{% extends 'base_login.html' %}
+
+{% block title %}
+    {{ res_value('REGISTER_NEW_USER') }}
+{% endblock %}
+
+{% block main_title %}
+    <h1 class="title">{{ res_value('REGISTER_NEW_EMPLOYEE') }}</h1>
+{% endblock %}
+
+{% block body %}
+<div class="div_login_page">
+<form class="form_register" method="POST">
+    <div class="title_message">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for msg in messages %}
+                    <li>{{ msg }} </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    </div>
+    <table>
+        <tr>
+            <td><a class="label_username">{{ res_value('INSERT_IIN') }}</a></td>
+            <td><input class="form_username" type="text" name="username"></td>
+        </tr>
+        <tr>
+            <td><a class="label_username">{{ res_value('PASSWORD') }}</a></td>
+            <td><input class="form_password" type="password" name="password"></td>
+        </tr>
+        <tr>
+        <td><input class="bt register" type="submit" value="{{ res_value('START_TEST') }}"></td>
+        </tr>
+    </table>
+</form>
+</div>
+{% endblock %}

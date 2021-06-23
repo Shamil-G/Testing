@@ -1,0 +1,152 @@
+@import url('clear.css');
+@import url('forms.css');
+@import url('table_styles.css');
+@import url('button.css');
+@import url('elements.css');
+
+:root{
+    --base-color-text: #307080;
+}
+html, body {
+    width: 100%;
+    height: 100%;
+    /*color: #307080;*/
+    color: var(--base-color-text);
+    text-align: left;
+    font-family: Calibri, sans-serif;
+    /*background-image: url(mathematics.jpg);*/
+}
+nav, article_login, article_test, article_admin {
+    border-radius: 5px;
+    border: 1px solid rgba(0, 47, 189, 0.3);
+}
+header, footer {
+  padding-left: 8px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 47, 189, 0.3);
+}
+/* Для первой страницы (Ввод идентификатора) не нужна зона COMMAND*/
+.common-login-container {
+    min-height: 100%;
+    display: grid;
+    /*grid-template-columns: 1fr;*/
+    grid-template-rows: 32px 48px auto 32px;
+    grid-gap: 2px;
+    grid-template-areas: "header"
+                 "article_title"
+                 "article_login"
+                 "footer";
+}
+/* При тестировании нужна зона Command для навигации */
+.common-testing-container {
+    min-height: 100%;
+    display: grid;
+    /*grid-template-columns: 1fr;*/
+    grid-template-rows: 32px 48px auto 48px 32px;
+    grid-gap: 2px;
+    grid-template-areas: "header"
+                 "article_title"
+                 "article_test"
+                 "command"
+                 "footer";
+}
+/* При администрировании нужна зона навигации NAV слева  */
+.common-admin-container {
+    min-height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 8fr;
+    grid-template-rows: 28px 30px auto 24px;
+    grid-gap: 2px;
+    grid-template-areas: "header header"
+                 "nav article_title"
+                 "nav article_admin"
+                 "footer footer";
+}
+header {
+    color: white;
+    display: grid;
+    grid-template-columns: 4fr 4fr 1fr;
+    background: rgba(21, 165, 41, 1);
+    align-items: center;
+    grid-area: header;  /* задаем имя элемента */
+}
+footer {
+  display: grid;
+  grid-template-columns: 1fr 6fr;
+  color: white;
+  background: rgba(21, 165, 41, 1);
+  grid-area: footer;  /* задаем имя элемента */
+}
+.footer-l {
+    margin-left: 10px;
+    /*color: #307080;*/
+    font-weight: bold;
+}
+footer > .footer-r, header > .header-r {
+    /*margin-left: 15px;*/
+    margin-right: 10px;
+    text-align: right;
+}
+nav {
+    margin: 0;
+    padding: 2px;
+    display: grid;
+    grid-template-rows: repeat(5,minmax(20px, 10%));
+    grid-template-columns: 100%;
+    grid-row-gap: 3px;
+    grid-area: nav;  /* задаем имя элемента */
+}
+nav > a {
+    text-decoration: none;
+    font-weight:bold;
+    align-items: center;
+    padding-left: 5px;
+    display: flex;
+    color: #307080;
+    border: inherit;
+    border-radius: inherit;
+}
+nav > a:hover {
+  background: #b2f1f4;
+}
+article {
+  margin: 0;
+  display: flex; /*Для выравнивания заголовка по центру*/
+  align-items: center; /*Для выравнивания заголовка по центру*/
+  grid-area: article_login;  /* задаем имя элемента */
+}
+article_test {
+  margin: 0;
+  display: flex; /*Для выравнивания заголовка по центру*/
+  /*align-items: center; !*Для выравнивания заголовка по вертикали по центру*!*/
+  grid-area: article_test;  /* задаем имя элемента */
+}
+article_admin {
+  margin: 0;
+  display: flex; /*Для выравнивания заголовка по центру*/
+  align-items: center; /*Для выравнивания заголовка по центру*/
+  grid-area: article_admin;  /* задаем имя элемента */
+}
+.article_title_init {
+  display: flex; /*Для выравнивания заголовка по центру*/
+  align-items: center; /*Для выравнивания заголовка по центру*/
+  justify-content: center;
+  grid-area: article_title;  /* задаем имя элемента */
+}
+.command {
+  display: flex; /*Для выравнивания заголовка по центру*/
+  align-items: center; /*Для выравнивания заголовка по центру*/
+  justify-content: center;
+  grid-area: command;  /* задаем имя элемента */
+}
+.article_title {
+  display: flex; /*Для выравнивания заголовка по центру*/
+  align-items: center; /*Для выравнивания заголовка по центру*/
+  grid-area: article_title;  /* задаем имя элемента */
+}
+a[href^='/language'], header a[href^='/log'] {
+    color: white;
+    margin-left:15px;
+    padding-right: 5px;
+    text-decoration: none;
+}

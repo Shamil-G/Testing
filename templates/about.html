@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ res_value('ABOUT') }}
+{% endblock %}
+
+{% block main_title %}
+    <h1  class="title">{{ res_value('ABOUT') }}</h1>
+{% endblock %}
+
+{% block body %}
+<!--<div class="center">-->
+<!--     <table class="tbl_">-->
+     <table class="table_about">
+<!--        <caption style="caption-side: top;">Caption Участники проекта</caption>-->
+        <caption>{{ res_value('PROJECT_PARTICIPANTS') }}</caption>
+         <colgroup>
+            <col style="width: 32%">
+            <col style="width: 64%">
+         </colgroup>
+<!--        <header class="tbl header">Header Участники проекта</header>-->
+         <thead>
+             <tr>
+                <th>{{ res_value('ROLE') }}</th>
+                <th>{{ res_value('PARTICIPANTS') }}</th>
+             </tr>
+         </thead>
+         <tfoot></tfoot>
+         <tbody>
+              <tr>
+                  <td><a>{{ res_value('REQ_4_CALC_PART') }}</a></td>
+                  <td><a>Аскар Уткельбаев</a></td>
+              </tr>
+
+              <tr>
+                  <td><a>{{ res_value('CHECKING_CALC_PART') }}</a></td>
+                  <td><a>Дария Матайбаева, Маханбетали Алмасов</a></td>
+              </tr>
+
+              <tr>
+                  <td><a>{{ res_value('SOFT_REQUIREMENTS') }}</a></td>
+                  <td><a class="td_value">Шамиль Гусейнов</a></td>
+              </tr>
+              <tr>
+                  <td><a>{{ res_value('SOFT_DEVELOPERS') }}</a></td>
+                  <td><a>Шамиль Гусейнов</a></td>
+              </tr>
+          </tbody>
+    </table><br>
+<!--</div>-->
+{% endblock %}
