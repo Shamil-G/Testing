@@ -43,6 +43,7 @@ def view_models():
 @login_required
 def view_model_status():
     print("Id user: "+str(g.user.id_user)+" : "+g.user.username)
-    return render_template("testing.html", theme=get_theme(), question=get_quest())
+
+    return render_template("testing.html", theme=get_theme(), questions=get_quest(), answers=get_answers())
 
 

@@ -42,7 +42,7 @@ def load_questions():
             order_num = 1
             id_question = cursor.callfunc("admin.add_question", str, [id_theme, id_quest, quest])
 
-        cmd = "insert into answers q (id_answer, id_question, order_num, correctly, active, answer) " \
+        cmd = "insert into answers q (id_answer, id_question, order_num_answer, correctly, active, answer) " \
               "values ( seq_answer.nextval, " + str(id_question) + ", " + str(order_num) + ", '" + correctly + "', 'Y', '" + str(answer) + "')"
         cursor.execute(cmd)
         id_prev_quest = id_curr_quest
