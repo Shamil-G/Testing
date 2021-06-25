@@ -1,4 +1,6 @@
 APP_NAME = Тестирование
+FINISH = Завершить тест
+FINISH_TESTING = Завершить тестирование?
 FIRST_QUESTION = <<  В начало
 INSERT_IIN = ИИН:
 INVITE_TO_TESTING =  Для перехода к тестированию
@@ -7,5 +9,6 @@ NEXT_QUESTION =  Следующий  >
 PASSWORD = Пароль:
 PREV_QUESTION = <  Предыдущий
 REGISTER_NEW_EMPLOYEE = Регистрация пользователя перед началом тестирования
+RETURN_FOR_CHECK = Вернуться и проверить
 START_TEST = Начать тестирование
 SAVE_ANSWER = Сохранить

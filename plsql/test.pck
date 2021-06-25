@@ -9,7 +9,9 @@ create or replace package test is
   function navigate_question(iid_person in number, icommand in number)
     return nvarchar2;
   procedure set_answer(iid_person in number, iorder_num_answer in number);
-
+  function finish_part(iid_person in number) return nvarchar2;
+  function have_test(iid_person in number) return nvarchar2;
+  
   
   function get_question(iid_person in number) return nvarchar2;
 
@@ -118,6 +120,62 @@ create or replace package body test is
        return '';
     end if;
   commit;
+  end;
+
+  function finish_part(iid_person in number) return nvarchar2
+  is
+    cnt_selected      pls_integer;
+    v_count_question  pls_integer;
+  begin
+    select count_question into v_count_question
+    from themes_for_testing tft, testing t
+    where t.id_registration=tft.id_registration
+    and   t.id_current_theme=tft.id_theme
+    and t.status='Active'
+    and t.id_person=iid_person;
+    
+    
+    select count(selected) into cnt_selected
+    from answers_in_testing aft,
+         testing t, questions_for_testing q
+    where aft.id_question_for_testing=q.id_question_for_testing
+    and   q.id_registration=t.id_registration
+    and   q.id_theme=t.id_current_theme
+    and t.status='Active'
+    and t.id_person=iid_person
+    and aft.selected is not null;
+              
+    if cnt_selected!=v_count_question then
+       insert into protocol(event_date,message) 
+              values(SYSTIMESTAMP, 'Имеются неотвеченные вопросы '|| cnt_selected|| ' из ' ||v_count_question|| ', id_person: '||iid_person);
+       commit;
+      return 'Имеются неотвеченные вопросы!';
+    end if;
+    update testing t
+    set   t.status='Completed',
+          t.status_testing='Тестирование завершено',
+          t.end_time_testing=systimestamp
+    where t.status='Active'
+    and t.id_person=iid_person;
+    commit;
+    return 'Completed';
+  end;
+
+
+  function have_test(iid_person in number) return nvarchar2
+  is
+    message      varchar2(4);
+    v_cnt        pls_integer;
+  begin
+    message:='N';
+    select count(t.id_registration) into v_cnt
+    from testing t
+    where t.status='Active'
+    and   t.id_person=iid_person;
+    if v_cnt > 0 then
+      return 'Y';
+    end if;
+    return 'N';
   end;
 
   function get_question(iid_person in number) return nvarchar2

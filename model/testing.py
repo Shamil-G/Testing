@@ -16,6 +16,17 @@ class AnswerF(object):
         self.answer = answer
 
 
+def have_test():
+    if cfg.debug_level > 1:
+        print('Check have test for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
+    con = get_connection()
+    cursor = con.cursor()
+    mess = cursor.callfunc("test.have_test", str, [g.user.id_user])
+    cursor.close()
+    con.close()
+    return mess
+
+
 def get_theme():
     if cfg.debug_level > 1:
         print('Get questions for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
@@ -34,6 +45,19 @@ def navigate_question(command):
     con = get_connection()
     cursor = con.cursor()
     mess = cursor.callfunc("test.navigate_question", str, [g.user.id_user, command])
+    if mess:
+        print("Got message: " + mess)
+    cursor.close()
+    con.close()
+    return mess
+
+
+def finish_part():
+    if cfg.debug_level > 1:
+        print('1. Navigate Guestion: command: ' + str(g.user.username))
+    con = get_connection()
+    cursor = con.cursor()
+    mess = cursor.callfunc("test.finish_part", str, [g.user.id_user])
     if mess:
         print("Got message: " + mess)
     cursor.close()

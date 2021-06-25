@@ -1,0 +1,22 @@
+{% extends 'base_login.html' %}
+
+{% block title %}
+    {{ res_value('FINISH_TESTING') }}
+{% endblock %}
+
+{% block main_title %}
+    <h1 class="title">{{ res_value('FINISH_TESTING') }}</h1>
+{% endblock %}
+
+{% block body %}
+<div class="div_login_page">
+<form class="form_register">
+    <table>
+        <tr>
+            <a class="bt nav"  href="/finish/part">{{ res_value('FINISH') }}</a>
+            <a class="bt nav"  href="/testing/0">{{ res_value('RETURN_FOR_CHECK') }}</a>
+        </tr>
+    </table>
+</form>
+</div>
+{% endblock %}

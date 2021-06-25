@@ -25,7 +25,8 @@ def view_models():
         try:
             if username:
                 user = User().get_user_by_name(username)
-                if user is not None:
+                mess = have_test()
+                if user is not None and mess == 'Y':
                     login_user(user)
                     return redirect("/testing")
             flash("Пользователь в системе не существует")
@@ -37,6 +38,25 @@ def view_models():
             print("Ошибка при регистрации в системе "+str(username))
             return redirect("/")
     return render_template("login_page.html")
+
+
+@app.route('/finish')
+@login_required
+def view_finish():
+    if cfg.debug_level > 3:
+        print("Finish testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username)
+    return render_template("finish.html")
+
+
+@app.route('/finish/part')
+@login_required
+def view_finish_part():
+    if cfg.debug_level > 3:
+        print("Finish testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username)
+    mess = finish_part()
+    if mess == 'Completed':
+        return redirect("/")
+    return render_template("finish.html")
 
 
 @app.route('/testing')
@@ -52,8 +72,11 @@ def view_test():
 def view_change_question(command):
     if cfg.debug_level > 3:
         print("Change question. Id user: "+str(g.user.id_user)+" : "+str(command))
-    navigate_question(command)
-    return redirect("/testing")
+    mess = navigate_question(command)
+    if not mess:
+        return redirect("/testing")
+    if mess == "Завершить тестирование?":
+        return redirect("/finish")
 
 
 @app.route('/testing/save/<int:order_num_answer>')
