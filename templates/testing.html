@@ -9,26 +9,31 @@
 {% endblock %}
 
 {% block command %}
-    <input class="bt nav" type="submit" value="{{ res_value('FIRST_QUESTION') }}">
-    <input class="bt nav" type="submit" value="{{ res_value('PREV_QUESTION') }}">
-    <input class="bt nav" type="submit" value="{{ res_value('SAVE_ANSWER') }}">
-    <input class="bt nav" type="submit" value="{{ res_value('NEXT_QUESTION') }}">
-    <input class="bt nav" type="submit" value="{{ res_value('LAST_QUESTION') }}">
+    <a class="bt nav"  href="/testing/0">{{ res_value('FIRST_QUESTION') }}</a>
+    <a class="bt nav"  href="/testing/1">{{ res_value('PREV_QUESTION') }}</a>
+    <a class="bt nav"  href="/testing/3">{{ res_value('NEXT_QUESTION') }}</a>
+    <a class="bt nav"  href="/testing/4">{{ res_value('LAST_QUESTION') }}<a/>
 {% endblock %}
 
 {% block body %}
-<form class="form_register" method="POST">
-    <p class="question">
-        {% for el in questions %}
-        {{ el.order_num }}.  {{ el.question }}
-        {% endfor %}
-    </p>
-    <div>
+<!--<form class="form_register" method="POST">-->
+    <div class="answer">
+        <p class="question">
+            {% for el in questions %}
+            {{ el.order_num }}.  {{ el.question }}
+            {% endfor %}
+        </p>
         {% for el in answers %}
             <br><br>
-            <input name="select" type="radio" id="{{ el.id_answer }}"  value="{{ el.id_answer }}">
-            <label for="{{ el.id_answer }}" class="answer">{{ el.answer }}</label>
+            {% if el.selected %}
+                <input name="select" type="radio" id="{{ el.order_num_answer }}"  value="{{ el.order_num_answer }}" checked>
+            {% else %}
+                <input name="select" type="radio" id="{{ el.order_num_answer }}"  value="{{ el.order_num_answer }}">
+            {% endif %}
+<!--            <input name="select" type="radio" id="{{ el.order_num_answer }}"  value="{{ el.order_num_answer }}">-->
+            <label for="{{ el.order_num_answer }}"></label>
+            <a  href="/testing/save/{{ el.order_num_answer }}">{{ el.order_num_answer }}.  {{ el.answer }}</a>
         {% endfor %}
     </div>
-</form>
+<!--</form>-->
 {% endblock %}

@@ -41,9 +41,25 @@ def view_models():
 
 @app.route('/testing')
 @login_required
-def view_model_status():
-    print("Id user: "+str(g.user.id_user)+" : "+g.user.username)
-
+def view_test():
+    if cfg.debug_level > 3:
+        print("Testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username)
     return render_template("testing.html", theme=get_theme(), questions=get_quest(), answers=get_answers())
 
 
+@app.route('/testing/<int:command>')
+@login_required
+def view_change_question(command):
+    if cfg.debug_level > 3:
+        print("Change question. Id user: "+str(g.user.id_user)+" : "+str(command))
+    navigate_question(command)
+    return redirect("/testing")
+
+
+@app.route('/testing/save/<int:order_num_answer>')
+@login_required
+def view_save_answer(order_num_answer):
+    if cfg.debug_level > 3:
+        print("Save answer. Id user: "+str(g.user.id_user)+" : "+str(order_num_answer))
+    save_answer(order_num_answer)
+    return redirect("/testing/3")
