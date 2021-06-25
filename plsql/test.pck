@@ -6,11 +6,10 @@ create or replace package test is
   
   -- Public type declarations
   function get_theme(iid_person in number) return nvarchar2;
-  function navigate_question(iid_person in number, icommand in number)
-    return nvarchar2;
+  function navigate_question(iid_person in number, icommand in number) return number;
   procedure set_answer(iid_person in number, iorder_num_answer in number);
   function finish_part(iid_person in number) return nvarchar2;
-  function have_test(iid_person in number) return nvarchar2;
+  function have_test(iid_person in number) return number;
   
   
   function get_question(iid_person in number) return nvarchar2;
@@ -63,61 +62,72 @@ create or replace package body test is
   end;
   
   function navigate_question(iid_person in number, icommand in number)
-    return nvarchar2
+    return number
   is
    v_count_question pls_integer;
    v_cur_num_question pls_integer;
+   v_remain_time      pls_integer;
   begin
 --    insert into protocol(event_date,message) values(SYSTIMESTAMP, 'ПОлучена команда '|| icommand|| ', id_person: '||iid_person);
 --    commit;
-    /* Идем в начало*/
-    if icommand=0 then
-       update testing t
-       set    t.current_num_question=1
-       where  t.status='Active'       
-       and    t.id_person=iid_person;
-       commit;
-       return '';
-    end if;
-
-    /*Вытащим общее количество вопросов*/
-     select tft.count_question, t.current_num_question 
-            into v_count_question, v_cur_num_question
+    /*Вытащим общее количество вопросов и оставшееся время для тестировния*/
+     select tft.count_question, t.current_num_question
+            ,
+            ( extract(second from t.beg_time_testing - systimestamp) + 
+              extract(minute from t.beg_time_testing - systimestamp)*60 + 
+              extract(hour from t.beg_time_testing - systimestamp)*3600 + 
+              tft.period_for_testing 
+            )
+            into v_count_question, v_cur_num_question, v_remain_time
      from themes_for_testing tft, testing t
      where tft.id_registration=t.id_registration
      and   tft.id_theme=t.id_current_theme
      and   t.status='Active'       
      and   t.id_person=iid_person;
+
+    /* Идем в начало*/
+    if icommand=0 then
+       update testing t
+       set    t.current_num_question=1,
+              t.last_time_access=systimestamp
+       where  t.status='Active'       
+       and    t.id_person=iid_person;
+       commit;
+       return v_remain_time;
+    end if;
     /* Идем в конец*/
     if icommand=4 then
        update testing t
-       set    t.current_num_question=v_count_question
+       set    t.current_num_question=v_count_question,
+              t.last_time_access=systimestamp
        where  t.status='Active'       
        and    t.id_person=iid_person;
        commit;
-       return '';
+       return v_remain_time;
     end if;
     if icommand=3 then
        if v_cur_num_question=v_count_question then
-         return 'Завершить тестирование?';
+         return -100;
        end if;
        update testing t
-       set    t.current_num_question=current_num_question+1
+       set    t.current_num_question=current_num_question+1,
+              t.last_time_access=systimestamp
        where  t.status='Active'       
        and    t.id_person=iid_person;
        commit;
-       return '';
+       return v_remain_time;
     end if;
     if icommand=1 then
        if v_cur_num_question=1 then
-         return 'Мы в начале тестирования';
+         return v_remain_time;
        end if;
        update testing t
-       set    t.current_num_question=current_num_question-1
+       set    t.current_num_question=current_num_question-1,
+              t.last_time_access=systimestamp
        where  t.status='Active'       
        and    t.id_person=iid_person;
        commit;
-       return '';
+       return v_remain_time;
     end if;
   commit;
   end;
@@ -162,20 +172,27 @@ create or replace package body test is
   end;
 
 
-  function have_test(iid_person in number) return nvarchar2
+  function have_test(iid_person in number) return number
   is
-    message      varchar2(4);
     v_cnt        pls_integer;
   begin
-    message:='N';
-    select count(t.id_registration) into v_cnt
-    from testing t
+    select tft.period_for_testing into v_cnt
+    from testing t, 
+         themes_for_testing tft
+    where t.status='Active'
+    and   t.id_person=iid_person
+    and   t.id_registration=tft.id_registration
+    and   t.id_current_theme=tft.id_theme;
+    
+    update testing t
+    set t.beg_time_testing=systimestamp,
+        t.last_time_access=systimestamp,
+        t.status_testing='Идет тестирование'
     where t.status='Active'
     and   t.id_person=iid_person;
-    if v_cnt > 0 then
-      return 'Y';
-    end if;
-    return 'N';
+    commit;
+    return v_cnt;
+    exception when no_data_found then return '';
   end;
 
   function get_question(iid_person in number) return nvarchar2
