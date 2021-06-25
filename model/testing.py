@@ -44,12 +44,12 @@ def navigate_question(command):
         print('1. Navigate Guestion: command' + str(command) + ' : ' + str(g.user.username)  )
     con = get_connection()
     cursor = con.cursor()
-    mess = cursor.callfunc("test.navigate_question", str, [g.user.id_user, command])
-    if mess:
-        print("Got message: " + mess)
+    remain_time = cursor.callfunc("test.navigate_question", str, [g.user.id_user, command])
+    if remain_time:
+        print("Remain time: " + remain_time)
     cursor.close()
     con.close()
-    return mess
+    return remain_time
 
 
 def finish_part():

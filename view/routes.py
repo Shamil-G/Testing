@@ -8,6 +8,8 @@ from main_app import app
 import cx_Oracle
 import config as cfg
 
+remain_test_sec = 0
+
 if cfg.debug_level > 0:
     print("Routes стартовал...")
 
@@ -25,10 +27,12 @@ def view_models():
         try:
             if username:
                 user = User().get_user_by_name(username)
-                mess = have_test()
-                if user is not None and mess == 'Y':
+                if user is not None:
                     login_user(user)
-                    return redirect("/testing")
+                    global remain_test_sec
+                    remain_test_sec = have_test()
+                    if remain_test_sec and int(remain_test_sec) > 0:
+                        return redirect("/testing")
             flash("Пользователь в системе не существует")
             return redirect("/")
         except cx_Oracle.IntegrityError as e:
@@ -62,9 +66,10 @@ def view_finish_part():
 @app.route('/testing')
 @login_required
 def view_test():
-    if cfg.debug_level > 3:
-        print("Testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username)
-    return render_template("testing.html", theme=get_theme(), questions=get_quest(), answers=get_answers())
+    global remain_test_sec
+    if cfg.debug_level > 1:
+        print("+++ Testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username + ', remain_time: ' + remain_test_sec)
+    return render_template("testing.html", remain_time=remain_test_sec, theme=get_theme(), questions=get_quest(), answers=get_answers())
 
 
 @app.route('/testing/<int:command>')
@@ -72,11 +77,11 @@ def view_test():
 def view_change_question(command):
     if cfg.debug_level > 3:
         print("Change question. Id user: "+str(g.user.id_user)+" : "+str(command))
-    mess = navigate_question(command)
-    if not mess:
-        return redirect("/testing")
-    if mess == "Завершить тестирование?":
+    global remain_test_sec
+    remain_test_sec = navigate_question(command)
+    if int(remain_test_sec) <= 0:
         return redirect("/finish")
+    return redirect("/testing")
 
 
 @app.route('/testing/save/<int:order_num_answer>')

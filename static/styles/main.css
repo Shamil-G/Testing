@@ -30,7 +30,7 @@ header, footer {
     min-height: 100%;
     display: grid;
     /*grid-template-columns: 1fr;*/
-    grid-template-rows: 32px 48px auto 32px;
+    grid-template-rows: 32px 48px auto 24px;
     grid-gap: 2px;
     grid-template-areas: "header"
                  "article_title"
@@ -42,7 +42,8 @@ header, footer {
     min-height: 100%;
     display: grid;
     /*grid-template-columns: 1fr;*/
-    grid-template-rows: 32px 48px auto 48px 32px;
+    grid-template-rows: 32px 48px auto 52px 24px;
+    /*grid-template-rows: 32px 48px 680px 48px 32px;*/
     grid-gap: 2px;
     grid-template-areas: "header"
                  "article_title"
@@ -55,7 +56,7 @@ header, footer {
     min-height: 100%;
     display: grid;
     grid-template-columns: 1fr 8fr;
-    grid-template-rows: 28px 30px auto 24px;
+    grid-template-rows: 32px 48px auto 24px;
     grid-gap: 2px;
     grid-template-areas: "header header"
                  "nav article_title"
@@ -134,10 +135,18 @@ article_admin {
   grid-area: article_title;  /* задаем имя элемента */
 }
 .command {
-  display: flex; /*Для выравнивания заголовка по центру*/
+  display: grid;
   align-items: center; /*Для выравнивания заголовка по центру*/
-  justify-content: center;
   grid-area: command;  /* задаем имя элемента */
+  grid-template-columns: 6fr 1fr;
+}
+.all_command {
+  display: flex; /*Для выравнивания заголовка по центру*/
+  justify-content: center;
+}
+.timer_area {
+  display: flex; /*Для выравнивания заголовка по центру*/
+  justify-content: right;
 }
 .article_title {
   display: flex; /*Для выравнивания заголовка по центру*/

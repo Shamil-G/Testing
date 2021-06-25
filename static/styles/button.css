@@ -6,6 +6,23 @@
     background-image: url(printer_48.png);
 }
 
+.bt_command{
+    margin: 8px 16px;
+    /*margin: 6px 24px 6px 24px;*/
+    padding: 4px 12px 4px 12px;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    user-select: none;
+    line-height: 1.5;
+    border-radius: 5px;
+    color: #307080;
+    /*border: 1px solid #00538b;*/
+    /*background-color: rgb(226, 201, 174);*/
+    text-decoration: none;
+    transition: color .2s ease-in-out,background-color .2s ease-in-out, border-color .2s ease-in-out, box-shadow .2s ease-in-out;
+}
+
 .bt{
     margin: 12px 12px;
     padding: 6px 10px 6px 8px;
@@ -33,7 +50,7 @@
     font-weight: bolder;
 }
 
-.bt.nav {
+.bt.nav, .bt_command.nav {
     border: 1px solid rgba(0, 47, 189, 0.3);
     width: initial;
     font-weight: bold;
@@ -51,7 +68,7 @@
     color: lightgoldenrodyellow;
     background-color: #20608F;
 }
-.bt.nav:hover{
+.bt.nav:hover, .bt_command.nav:hover{
     color: #307080;
     text-decoration: none;
     color: lightgoldenrodyellow;

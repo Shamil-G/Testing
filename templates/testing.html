@@ -8,15 +8,29 @@
     <h1 class="title">{{ theme }}</h1>
 {% endblock %}
 
-{% block command %}
-    <a class="bt nav"  href="/testing/0">{{ res_value('FIRST_QUESTION') }}</a>
-    <a class="bt nav"  href="/testing/1">{{ res_value('PREV_QUESTION') }}</a>
-    <a class="bt nav"  href="/testing/3">{{ res_value('NEXT_QUESTION') }}</a>
-    <a class="bt nav"  href="/testing/4">{{ res_value('LAST_QUESTION') }}<a/>
+{% block timer_area %}
+    <p id="label_timer">Осталось: &nbsp</p>
+    <p id="timer">{{ remain_time }}</p>
+    <p id="label_sec">cек. </p>
+    <script>
+    setInterval(myTimer, 1000);
+    function myTimer() {
+        let ticks = document.getElementById("timer").innerHTML
+        if (ticks > 0) {
+            document.getElementById("timer").innerHTML = ticks - 1
+        }
+    }
+    </script>
+{% endblock %}
+
+{% block all_command %}
+    <a class="bt_command nav"  href="/testing/0">{{ res_value('FIRST_QUESTION') }}</a>
+    <a class="bt_command nav"  href="/testing/1">{{ res_value('PREV_QUESTION') }}</a>
+    <a class="bt_command nav"  href="/testing/3">{{ res_value('NEXT_QUESTION') }}</a>
+    <a class="bt_command nav"  href="/testing/4">{{ res_value('LAST_QUESTION') }}</a>
 {% endblock %}
 
 {% block body %}
-<!--<form class="form_register" method="POST">-->
     <div class="answer">
         <p class="question">
             {% for el in questions %}
@@ -30,10 +44,9 @@
             {% else %}
                 <input name="select" type="radio" id="{{ el.order_num_answer }}"  value="{{ el.order_num_answer }}">
             {% endif %}
-<!--            <input name="select" type="radio" id="{{ el.order_num_answer }}"  value="{{ el.order_num_answer }}">-->
             <label for="{{ el.order_num_answer }}"></label>
             <a  href="/testing/save/{{ el.order_num_answer }}">{{ el.order_num_answer }}.  {{ el.answer }}</a>
         {% endfor %}
     </div>
-<!--</form>-->
 {% endblock %}
+
