@@ -101,7 +101,9 @@ def get_answers():
         print('Get answer for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
     con = get_connection()
     cursor = con.cursor()
-    cmd = "select aft.order_num_answer, aft.selected, a.answer " \
+    cmd = "select aft.order_num_answer, " \
+          "case when coalesce(q.id_answer,0)=aft.id_answer then 'Y' else 'N' end as selected, " \
+          "a.answer " \
           "from answers a, answers_in_testing aft, " \
           "testing t, questions_for_testing q " \
           "where a.id_question=q.id_question " \

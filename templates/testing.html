@@ -39,10 +39,10 @@
         </p>
         {% for el in answers %}
             <br><br>
-            {% if el.selected %}
-                <input name="select" type="radio" id="{{ el.order_num_answer }}"  value="{{ el.order_num_answer }}" checked>
+            {% if el.selected == 'Y' %}
+                <input name="select" style="text-decoration: none;" type="radio" id="{{ el.order_num_answer }}"  value="{{ el.order_num_answer }}" checked>
             {% else %}
-                <input name="select" type="radio" id="{{ el.order_num_answer }}"  value="{{ el.order_num_answer }}">
+                <input name="select" style="text-decoration: none;" type="radio" id="{{ el.order_num_answer }}"  value="{{ el.order_num_answer }}">
             {% endif %}
             <label for="{{ el.order_num_answer }}"></label>
             <a  href="/testing/save/{{ el.order_num_answer }}">{{ el.order_num_answer }}.  {{ el.answer }}</a>
