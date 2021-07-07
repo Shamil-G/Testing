@@ -1,7 +1,8 @@
-host='192.168.5.59'
-port='5002'
+host='192.168.1.46'
+port='5005'
 REPORTS_PATH = './reports/spool/'
 debug_level = 2
 src_lang = 'file'
 language = 'ru'
-os = '!unix'
+print_at_once = False
+os = 'unix'

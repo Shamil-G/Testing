@@ -3,8 +3,8 @@ import config as cfg
 import xlsxwriter
 import datetime
 import os.path
-import win32api
-import win32print
+#import win32api
+#import win32print
 from datetime import date, timedelta
 
 
@@ -97,13 +97,14 @@ def print_result_test(id_registration):
 
     print("Завершен расчет: " + datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
     if cfg.print_at_once:
-        my_printer = win32print.GetDefaultPrinter()
-        win32api.ShellExecute(
-            0,
-            "print",
-            file_name,
-            my_printer,
-            ".",
-            0
-        )
+       None
+#        my_printer = win32print.GetDefaultPrinter()
+#        win32api.ShellExecute(
+#            0,
+#            "print",
+#            file_name,
+#            my_printer,
+#            ".",
+#            0
+#        )
     return file_name
