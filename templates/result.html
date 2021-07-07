@@ -1,10 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base_testing.html' %}
+
+{% block title %}
+    {{ res_value('TEST_FINISHED') }}
+{% endblock %}
+
+{% block main_title %}
+    <h1 class="title">{{ res_value('TEST_FINISHED') }}</h1>
+{% endblock %}
+
+{% block timer_area %}
+{% endblock %}
+
+{% block all_command %}
+    <a class="bt_command nav"  href="/uploads/{{ result_file }}">{{ res_value('PRINT_RESULT') }}</a>
+    <a class="bt_command nav"  href="/">{{ res_value('EXIT') }}</a>
+{% endblock %}
+
+{% block body %}
+    <div class="answer">
+        <h1 class="question">
+            {{  fio }}
+        </h1>
+        <table>
+            <tbody>
+            <tr style="margin-top: 15px;">
+                <td><p style="margin-left: 14px;">Ид:</p></td>
+                <td><p>{{ id_reg }}</p></td>
+            </tr>
+            <tr>
+                <td><p style="margin-left: 14px;">ИИН:&ensp;</p></td>
+                <td><p>{{ iin }}</p></td>
+            </tr>
+            </tbody>
+        </table>
+        <table>
+            <tbody>
+            <tr style="margin-left: 14px; margin-top: 10px;">
+                <td><p style="margin-left: 14px; margin-top: 3px;">Начало тестирования:</p></td>
+                <td><p>{{ time_beg }}</p></td>
+            </tr>
+            <tr>
+                <td><p style="margin-left: 14px;">Окончание тестирования:&ensp;</p></td>
+                <td><p>{{ time_end }}</p></td>
+            </tr>
+            </tbody>
+        </table>
+        <table class="table_model_status">
+        <thead>
+             <th>№</th>
+             <th style="text-align: left"><a class="title2">{{ res_value('THEME_NAME') }}</a></th>
+             <th><a class="title2">{{ res_value('COUNT_QUESTION') }}</a></th>
+             <th><a class="title2">{{ res_value('COUNT_FOR_SUCCESS') }}</a></th>
+             <th><a class="title2">{{ res_value('COUNT_TRUE') }}</a></th>
+             <th><a class="title2">{{ res_value('COUNT_FALSE') }}</a></th>
+        </thead>
+            <tbody>
+        {% for el in cursor %}
+            <tr>
+             <td><a class="title2">{{ el.theme_number }}</a></td>
+             <td style="text-align: left"><a class="title2">{{ el.theme_name }}</a></td>
+             <td><a class="title2">{{ el.count_question }}</a></td>
+             <td><a class="title2">{{ el.count_success }}</a></td>
+             <td><a class="title2">{{ el.true_score }}</a></td>
+             <td><a class="title2">{{ el.false_score }}</a></td>
+            </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

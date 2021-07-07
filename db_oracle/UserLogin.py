@@ -53,20 +53,21 @@ class User:
             print("++++ get_user_by_name: " + user_name)
         conn = get_connection()
         cursor = conn.cursor()
-        password = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
         id_user = cursor.var(cx_Oracle.DB_TYPE_NUMBER)
+        # password = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
         message = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
 
-        cursor.callproc('cop.login', (user_name, password, id_user, message))
-        if message is not None:
-            self.username = user_name
-            self.password = password.getvalue()
+        cursor.callproc('cop.login', (user_name, id_user, message))
+        if message.getvalue() is None:
             self.id_user = id_user.getvalue()
+            self.username = user_name
+            self.password = ''
         cursor.close()
         conn.close()
         if self.id_user is None:
             return None
         else:
+            print('+++ 3. LOGIN: ' + str(self.username) + ' ' + str(self.id_user) + ' ' + str(message.getvalue()))
             return self
 
     def have_role(self, role_name):

@@ -1,134 +1,109 @@
-from db_oracle.connect import get_connection
+from model.testing import get_result, get_result_info
 import config as cfg
 import xlsxwriter
 import datetime
 import os.path
+import win32api
+import win32print
 from datetime import date, timedelta
 
 
-# first = today.replace(day=1)
-
-
-def rep_refund_031knp():
+def print_result_test(id_registration):
     now = datetime.datetime.now()
     # today = datetime.date.today()
+    id_reg, iin, time_beg, time_end, fio = get_result_info()
 
-    file_name = 'Отчет о переведенных из ГФСС в ГК ошибочных СО и пени, возвращенных обратно на счет ГФСС от ' + now.strftime("%d.%m.%Y %H-%M-%S") + '.xlsx'
+    file_name = 'result ' + str(id_reg) + '.xlsx'
     file_path = cfg.REPORTS_PATH + file_name
 
     if os.path.isfile(file_path):
         return file_name
-    else:
-        con = get_connection()
-        cursor = con.cursor()
 
     workbook = xlsxwriter.Workbook(file_path)
     worksheet = workbook.add_worksheet()
-    worksheet.set_column(0, 0, 5)
-    worksheet.set_column(1, 1, 12)
-    worksheet.set_column(2, 2, 10)
-    worksheet.set_column(3, 3, 12)
-    worksheet.set_column(4, 4, 12)
-    worksheet.set_column(5, 5, 12)
-    worksheet.set_column(6, 6, 12)
-    worksheet.set_column(7, 7, 12)
-    worksheet.set_column(8, 8, 12)
-    worksheet.set_column(9, 9, 12)
-    worksheet.set_column(10, 10, 12)
-    worksheet.set_column(11, 11, 12)
-    worksheet.set_column(12, 12, 12)
-    worksheet.set_column(13, 13, 12)
-    worksheet.set_column(14, 14, 12)
-    worksheet.set_column(15, 15, 12)
-    worksheet.set_column(16, 16, 12)
-    worksheet.set_column(17, 17, 12)
+    worksheet.set_column(0, 0, 1)
+    worksheet.set_column(1, 1, 5)
+    worksheet.set_column(2, 2, 22)
+    worksheet.set_column(3, 3, 16)
+    worksheet.set_column(4, 4, 10)
+    worksheet.set_column(5, 5, 8)
+    worksheet.set_column(6, 6, 10)
+    worksheet.set_column(7, 7, 8)
 
-    print("Начало расчета за " + now.strftime("%d-%m-%Y %H:%M:%S"))
-
-    # try:
-    #	import cx_Oracle
-    # except  ImportError:
-    #	print ("Import Error:",info)
-    #	exit()
-
-    # if cx_Oracle.version<'7.3.0':
-    #	print ("Very old version of cx_Oracle :",cx_Oracle.version)
-    #	exit()
-
-    # print ("Version cx_Oracle :",cx_Oracle.version)
-
-    # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
-    # cursor=con.cursor()
-
-    print("DSN: " + str(con.dsn))
-    print("Версия: " + con.version)
-
-    print("\nНачинаем расчет: " + datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
-
-    cursor.execute("select rownum, a.sior_id, " +
-                   "a.gfss_in_nom, " +
-                   "to_char(a.doc_date,'dd.mm.yyyy'), " +
-                   "a.p_bin, " +
-                   "a.p_name, " +
-                   "a.fio, " +
-                   "a.iin, " +
-                   "a.doc_ret, " +
-                   "to_char(a.date_ret,'dd.mm.yyyy'), " +
-                   "a.sum_gfss, " +
-                   "a.period, " +
-                   "to_char(a.date_ret_gk,'dd.mm.yyyy'), " +
-                   "a.sum_ret_gk, " +
-                   "a.doc_num_df, " +
-                   "to_char(a.doc_date_df,'dd.mm.yyyy'), " +
-                   "a.reason_return " +
-                   "from HIST_RET_SO_031KNP a " +
-                   "where a.deleted = 'N' ")
+    cursor = get_result(id_registration)
 
     print("Провели расчет и формируем Excel: " + datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
 
-    common_format = workbook.add_format({'align': 'center','border': 1})
-    common_format.set_align('vcenter')
+    title1_cell_format = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'size': 18})
+    worksheet.merge_range('B1:H1', "", title1_cell_format)
+    worksheet.set_row(0, 32)
+    worksheet.set_row(1, 24)
+    worksheet.set_row(2, 16)
+
+    title2_cell_format = workbook.add_format({'align': 'left', 'bold': True, 'valign': 'vcenter', 'size': 14, 'underline': True})
+    title3_cell_format = workbook.add_format({'align': 'left', 'bold': True, 'valign': 'vcenter', 'size': 12})
+    title3_1_cell_format = workbook.add_format({'align': 'left', 'valign': 'vcenter', 'size': 12})
+    theme_name_format = workbook.add_format({'align': 'left', 'valign': 'vcenter', 'border': 1, 'text_wrap': True})
+
+    worksheet.merge_range('B2:H2', "", title2_cell_format)
+    worksheet.merge_range('B5:C5', "", title3_cell_format)
+    worksheet.merge_range('B6:C6', "", title3_cell_format)
+    worksheet.merge_range('C8:D8', "", theme_name_format)
+
+    common_format = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'border': 1})
     common_format.set_text_wrap()
-    common_format_2 = workbook.add_format({'align':'center','bold': True ,'border': 1})
+    common_format_2 = workbook.add_format({'align': 'center', 'bold': True, 'border': 1})
     common_format_2.set_align('vcenter')
     common_format_2.set_text_wrap()
-    sum_pay_format = workbook.add_format({'num_format': '#,###,##0.00', 'font_color':'black', 'align': 'vcenter'})
+    sum_pay_format = workbook.add_format({'num_format': '#,###,##0.00', 'font_color': 'black', 'align': 'vcenter'})
     #date_format = workbook.add_format({'num_format':'dd/mm/yy', 'align': 'vcenter'})
 
-    worksheet.write('A1','№',common_format_2)
-    worksheet.write('B1', '№ заявки', common_format_2)
-    worksheet.write('C1', 'вх.№ письма ГК в ГФСС', common_format_2)
-    worksheet.write('D1', 'Дата письма ГК в ГФСС', common_format_2)
-    worksheet.write('E1', 'БИН плательщика', common_format_2)
-    worksheet.write('F1', 'Наименование плательщика', common_format_2)
-    worksheet.write('G1', 'ФИО участника СОСС', common_format_2)
-    worksheet.write('H1', 'ИИН участника СОСС', common_format_2)
-    worksheet.write('I1', 'Номер платежки отправки средств из ГФСС в ГК', common_format_2)
-    worksheet.write('J1', 'Дата отправки средств из ГФСС в ГК', common_format_2)
-    worksheet.write('K1', 'Сумма, переведенная  из ГФСС', common_format_2)
-    worksheet.write('L1', 'Период', common_format_2)
-    worksheet.write('M1', 'Дата поступления средств из  ГК в ГФСС', common_format_2)
-    worksheet.write('N1', 'Сумма, переведенная в ГФСС из ГК', common_format_2)
-    worksheet.write('O1', 'Номер письма Департамента Финансов', common_format_2)
-    worksheet.write('P1', 'Дата письма Департамента Финансов', common_format_2)
-    worksheet.write('Q1', 'Причина возврата', common_format_2)
+    worksheet.write('B1', 'РЕЗУЛЬТАТЫ ТЕСТИРОВАНИЯ', title1_cell_format)
+    worksheet.write('B2', fio, title2_cell_format)
+    worksheet.write('B3', 'Ид:', title3_cell_format)
+    worksheet.write('C3', id_reg, title3_1_cell_format)
+    worksheet.write('B4', 'ИИН:', title3_cell_format)
+    worksheet.write('C4', iin, title3_1_cell_format)
+
+    ft_beg = time_beg.strftime('%d.%m.%Y  %H:%M:%S')
+    ft_end = time_end.strftime('%d.%m.%Y  %H:%M:%S')
+
+    worksheet.write('B5', 'Начало тестирования:', title3_cell_format)
+    worksheet.write('D5', ft_beg, title3_1_cell_format)
+    worksheet.write('B6', 'Окончание тестирования:', title3_cell_format)
+    worksheet.write('D6', ft_end, title3_1_cell_format)
+
+    worksheet.write('B8', '№', common_format_2)
+    worksheet.write('C8', 'Задание', common_format_2)
+    worksheet.write('E8', 'Вопросов', common_format_2)
+    worksheet.write('F8', 'Порог', common_format_2)
+    worksheet.write('G8', 'Верных ответов', common_format_2)
+    worksheet.write('H8', 'Ошибок', common_format_2)
     row = 0
     for record in cursor:
-        col = 0
-        for list_val in record:
-            if col < 17:
-                worksheet.write(row + 1, col, list_val, common_format)
-            if col == 17:
-                worksheet.write(row + 1, col, list_val, sum_pay_format)
-            col += 1
+        merge_format = 'C'+str(row+8+1)+':D'+str(row+8+1) + ''
+
+        worksheet.merge_range(merge_format, "", theme_name_format)
+        worksheet.write(row + 8, 1, record.theme_number, common_format)
+        worksheet.write(row + 8, 2, record.theme_name, theme_name_format)
+        worksheet.write(row + 8, 4, record.count_question, common_format)
+        worksheet.write(row + 8, 5, record.count_success, common_format)
+        worksheet.write(row + 8, 6, record.true_score, common_format)
+        worksheet.write(row + 8, 7, record.false_score, common_format)
         row += 1
-    # worksheet.write(row+1,3, "=SUM(D2:D"+str(row+1)+")",sum_pay_format)
+
+    worksheet.write(row + 8 + 1, 1, now.strftime("%d.%m.%Y %H:%M:%S"))
     workbook.close()
 
-    now = datetime.datetime.now()
-
-    print("Завершен расчет: " + now.strftime("%d-%m-%Y %H:%M:%S"))
-
-    con.commit()
-    con.close()
+    print("Завершен расчет: " + datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
+    if cfg.print_at_once:
+        my_printer = win32print.GetDefaultPrinter()
+        win32api.ShellExecute(
+            0,
+            "print",
+            file_name,
+            my_printer,
+            ".",
+            0
+        )
     return file_name

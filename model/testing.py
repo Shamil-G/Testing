@@ -1,5 +1,6 @@
 from flask import send_from_directory, session, redirect, url_for, request, g
 from db_oracle.connect import get_connection
+import cx_Oracle
 import config as cfg
 
 
@@ -14,6 +15,16 @@ class AnswerF(object):
         self.order_num_answer = order_num_answer
         self.selected = selected
         self.answer = answer
+
+
+class ResultF(object):
+    def __init__(self, theme_number, theme_name, count_question, count_success, true_score, false_score):
+        self.theme_number = theme_number
+        self.theme_name = theme_name
+        self.count_question = count_question
+        self.count_success = count_success
+        self.true_score = true_score
+        self.false_score = false_score
 
 
 def have_test():
@@ -52,17 +63,22 @@ def navigate_question(command):
     return remain_time
 
 
-def finish_part():
+def finish_part(force_finish):
     if cfg.debug_level > 1:
-        print('1. Navigate Guestion: command: ' + str(g.user.username))
+        print('1. FINISH PART. command: ' + str(force_finish) + ' : ' + str(g.user.username))
     con = get_connection()
     cursor = con.cursor()
-    mess = cursor.callfunc("test.finish_part", str, [g.user.id_user])
+    mess = cursor.callfunc("test.finish_part", str, [g.user.id_user, force_finish])
     if mess:
         print("Got message: " + mess)
     cursor.close()
     con.close()
     return mess
+
+
+def finish_force():
+    mess = finish_part(1)
+    return
 
 
 def save_answer(order_num_question):
@@ -117,4 +133,44 @@ def get_answers():
           "order by aft.order_num_answer"
     cursor.execute(cmd)
     cursor.rowfactory = AnswerF
+    return cursor
+
+
+def get_result_info():
+    if cfg.debug_level > 1:
+        print('Get Result Info: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
+    con = get_connection()
+    cursor = con.cursor()
+    id_reg = cursor.var(cx_Oracle.DB_TYPE_NUMBER)
+    iin = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
+    time_beg = cursor.var(cx_Oracle.DB_TYPE_DATE)
+    time_end = cursor.var(cx_Oracle.DB_TYPE_DATE)
+    fio = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
+    cursor.callproc('test.get_personal_info', (g.user.id_user, id_reg, iin, time_beg, time_end, fio))
+    print('Got result info ' + fio.getvalue())
+    return id_reg.getvalue(), iin.getvalue(), time_beg.getvalue(), time_end.getvalue(), fio.getvalue()
+
+
+def get_result(id_registration):
+    if cfg.debug_level > 1:
+        print('Get answer for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
+    con = get_connection()
+    cursor = con.cursor()
+    cmd = 'select theme_number, descr as theme_name, count_question, count_success, ' \
+          'sum(true_result) true_score, sum(false_result) false_score ' \
+          'from ( ' \
+          'select th.id_theme, theme_number, th.descr, tft.count_question, tft.count_success, ' \
+          'case when correctly=\'Y\' then 1 else 0 end true_result, ' \
+          'case when correctly != \'Y\' then 1 else 0 end false_result ' \
+          'from questions_for_testing qft, answers a, ' \
+          'themes_for_testing tft, themes th ' \
+          'where qft.id_registration=tft.id_registration ' \
+          'and qft.id_theme=th.id_theme ' \
+          'and a.id_answer(+) = qft.id_answer ' \
+          'and tft.id_registration = :id ' \
+          'and tft.id_theme = th.id_theme ' \
+          ') ' \
+          'group by theme_number, count_question, count_success, descr'
+    cursor.execute(cmd, [id_registration])
+    cursor.rowfactory = ResultF
     return cursor
