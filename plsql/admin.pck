@@ -88,8 +88,8 @@ create or replace package body admin is
     v_id_theme := coalesce(v_id_theme, 0)+1;
     select count(id_theme) into v_num_theme from bundle_themes t where t.id_task=iid_task;
     
-    insert into themes(id_theme, active, descr) values(v_id_theme, 'Y', theme_name);
-    insert into bundle_themes(id_task, id_theme,theme_number, count_question, count_success)
+    insert into themes(id_theme, descr) values(v_id_theme, theme_name);
+    insert into bundle_themes(id_task, id_theme, theme_number, count_question, count_success)
                 values(iid_task, v_id_theme, v_num_theme+1, 0, 0);
     commit;
     return v_id_theme;                 
@@ -167,12 +167,14 @@ create or replace package body admin is
     select count(id_registration) into v_count_registr 
     from testing t 
     where t.status='Active' 
-    and t.id_person=iid_person;
+    and t.id_person=iid_person
+    and t.status_testing!='Completed';
     
     if v_count_registr>0 then
        log('ADD TEST. Person with id_person:  '||iid_person||' has an outstanding task');
       return;
     end if;
+    
     v_id_registration:=seq_registration.nextval;
     log('ADD TEST. Person id_person:  '||iid_person||' got id_registration: '||v_id_registration);
 --  Ïîäãîòîâèì òàáëèöó ó÷åòà ïğîõîæäåíèÿ òåì     
@@ -260,7 +262,12 @@ create or replace package body admin is
           end if;
         end loop;
     end loop;
-    
+
+    /* Îòïğàâèì â àğõèâ ïğåäûäóùèå òåñòèğîâàíèÿ */
+    update testing t
+    set    t.status='Archived'
+    where  t.id_person=iid_person;
+    /* Äîáàâìè íîâîå òåñòèğîâàíèå */    
     insert into testing(id_registration, id_person, category, id_organization, date_registration, 
                 id_pc, id_current_theme, current_num_question, language, date_testing, period_for_testing,
                 beg_time_testing, end_time_testing, last_time_access, end_day_testing, 
@@ -290,7 +297,7 @@ create or replace package body admin is
         select coalesce(max(id_person),0) into v_id_person from persons;
         insert into persons(id_person, iin, fio) values(v_id_person+1, iiin, ifio);
         commit;
-        add_test(iid_person => v_id_person, iid_task =>iid_task );
+        add_test(iid_person => v_id_person+1, iid_task =>iid_task );
       end;
   end;
   
