@@ -18,6 +18,7 @@ class User:
     username = ''
     password = ''
     active = ''
+    remain_time = 0
     roles: List[Any] = []
     debug = False
 
@@ -54,14 +55,16 @@ class User:
         conn = get_connection()
         cursor = conn.cursor()
         id_user = cursor.var(cx_Oracle.DB_TYPE_NUMBER)
-        # password = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
+        remain_time = cursor.var(cx_Oracle.DB_TYPE_NUMBER)
         message = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
 
-        cursor.callproc('cop.login', (user_name, id_user, message))
+        cursor.callproc('cop.login', (user_name, id_user, remain_time, message))
         if message.getvalue() is None:
             self.id_user = id_user.getvalue()
             self.username = user_name
+            self.remain_time = remain_time.getvalue()
             self.password = ''
+        print('Остаток времени: ' + str(self.remain_time))
         cursor.close()
         conn.close()
         if self.id_user is None:

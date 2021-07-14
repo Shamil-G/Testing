@@ -8,11 +8,21 @@ create or replace package test is
   function get_theme(iid_person in number) return nvarchar2;
   function navigate_question(iid_person in number, icommand in number) return number;
   procedure set_answer(iid_person in number, iorder_num_answer in number);
-  function finish_part(iid_person in number) return nvarchar2;
+
+  procedure finish(iid_person in number);
+  function finish_info(iid_person in number, iforce_finish in number) return nvarchar2;
   function have_test(iid_person in number) return number;
   
   
   function get_question(iid_person in number) return nvarchar2;
+  function get_result(iid_registration in number) return sys_refcursor;
+  procedure get_personal_info( iid_person in number, oid_reg out number, 
+                             oiin out varchar2, otime_beg out date,
+                             otime_end out date, ofio out nvarchar2 );
+
+  procedure get_personal_info( iid_registration in number, 
+                             oiin out varchar2, otime_beg out date,
+                             otime_end out date, ofio out nvarchar2 );
 
 end test;
 /
@@ -121,6 +131,7 @@ create or replace package body test is
   function navigate_question(iid_person in number, icommand in number)
     return number
   is
+   v_status_testing  testing.status_testing%type;
    v_count_question pls_integer;
    v_cur_num_question pls_integer;
    v_remain_time      pls_integer;
@@ -130,29 +141,31 @@ create or replace package body test is
 --    insert into protocol(event_date,message) values(SYSTIMESTAMP, 'ПОлучена команда '|| icommand|| ', id_person: '||iid_person);
 --    commit;
     /*Вытащим общее количество вопросов и оставшееся время для тестировния*/
-    log('1. navigate_question. id_person: '||iid_person||' : COMMAND: '||icommand);
-     select tft.id_registration, tft.theme_number, tft.count_question, t.current_num_question
-            ,
+     select tft.id_registration, tft.theme_number, tft.count_question, t.current_num_question, t.status_testing,
             ( extract(second from t.beg_time_testing - systimestamp) + 
               extract(minute from t.beg_time_testing - systimestamp)*60 + 
               extract(hour from t.beg_time_testing - systimestamp)*3600 + 
               t.period_for_testing 
             )
-            into v_id_registration, v_theme_number, v_count_question, v_cur_num_question, v_remain_time
+            into v_id_registration, v_theme_number, v_count_question, v_cur_num_question, v_status_testing, v_remain_time
      from themes_for_testing tft, testing t
      where tft.id_registration=t.id_registration
      and   tft.id_theme=t.id_current_theme
      and   t.status='Active'       
      and   t.id_person=iid_person;
 
-    log('2. navigate_question. id_person: '||iid_person||' : '||icommand||' id_registration: '||v_id_registration||', theme_number: '||v_theme_number);
+    log('1. navigate_question. id_person: '||iid_person||' : '||icommand||' id_registration: '||v_id_registration||
+            ', theme_number: '||v_theme_number||', num_question: '||v_cur_num_question||', time remain: '||v_remain_time);
 
+    if v_status_testing='Completed' then
+       return 0;
+    end if;
     /* Идем в начало*/
     if icommand=0 then
        update testing t
        set    t.current_num_question=1,
               t.last_time_access=systimestamp
-       where  t.status='Active'       
+       where  t.status='Active'
        and    t.id_person=iid_person;
     end if;
     /* Идем в конец*/
@@ -160,20 +173,22 @@ create or replace package body test is
        update testing t
        set    t.current_num_question=v_count_question,
               t.last_time_access=systimestamp
-       where  t.status='Active'       
+       where  t.status='Active'
        and    t.id_person=iid_person;
     end if;
     /* */
     if icommand=3 then
        if v_cur_num_question=v_count_question then
           if next_theme(iid_person, icommand, v_id_registration, v_theme_number)=-100 then
+              log('2. ABSENT NEXT THEME. navigate_question. id_person: '||iid_person||' : '||icommand||' id_registration: '||v_id_registration||
+                      ', theme_number: '||v_theme_number||', num_question: '||v_cur_num_question||', time remain: '||v_remain_time);
             return -100;
           end if;
        else 
           update testing t
           set    t.current_num_question=current_num_question+1,
                 t.last_time_access=systimestamp
-          where  t.status='Active'       
+          where  t.status='Active'
           and    t.id_person=iid_person;
        end if;
     end if;
@@ -187,7 +202,7 @@ create or replace package body test is
          update testing t
          set    t.current_num_question=current_num_question-1,
                 t.last_time_access=systimestamp
-         where  t.status='Active'       
+         where  t.status='Active'
          and    t.id_person=iid_person;
        end if;
     end if;
@@ -196,35 +211,52 @@ create or replace package body test is
     return v_remain_time;
   end;
 
-  function finish_part(iid_person in number) return nvarchar2
+  function finish_info(iid_person in number, iforce_finish in number) return nvarchar2
   is
-    cnt_selected      pls_integer;
-    v_count_question  pls_integer;
     v_unanswered       pls_integer;
   begin
-    select count(q.id_question) 
-    into v_unanswered
-    from testing t, questions_for_testing q
-    where q.id_registration=t.id_registration
-    and   q.id_theme=t.id_current_theme
-    and t.status='Active'
-    and t.id_person=iid_person
-    and q.id_answer is null;
-              
-    if v_unanswered>0 then
-       insert into protocol(event_date,message) 
-              values(SYSTIMESTAMP, 'Имеются неотвеченные вопросы '|| cnt_selected|| ' из ' ||v_count_question|| ', id_person: '||iid_person);
-       commit;
-      return 'Имеются неотвеченные вопросы!';
-    end if;
+      select count(q.id_question) 
+      into v_unanswered
+      from testing t, questions_for_testing q
+      where q.id_registration=t.id_registration
+      and   q.id_theme=t.id_current_theme
+      and t.status='Active'
+      and t.id_person=iid_person
+      and coalesce(q.id_answer,0)=0;
+                        
+      if v_unanswered>0 then
+         insert into protocol(event_date,message) 
+                values(SYSTIMESTAMP, 'Имеются неотвеченные вопросы. id_person: '|| iid_person ||', в количестве: ' ||v_unanswered);
+         commit;
+        if v_unanswered=1 or v_unanswered=21 or v_unanswered=31 or 
+           v_unanswered=41 or v_unanswered=51 or v_unanswered=61  
+           then
+             return 'Имется '||v_unanswered||' неотвеченный вопрос!';
+        end if;
+        if v_unanswered<5 or 
+                v_unanswered between 22 and 24 or
+                v_unanswered between 32 and 34 or
+                v_unanswered between 42 and 44 or
+                v_unanswered between 52 and 54 or
+                v_unanswered between 62 and 64
+        then
+                return 'Имется '||v_unanswered||' неотвеченных вопроса!';
+        end if;
+        return 'Имется '||v_unanswered||' неотвеченных вопросов!';
+      end if;
+      return '';
+  end;
+
+  procedure finish(iid_person in number)
+  is
+    v_unanswered       pls_integer;
+  begin
     update testing t
-    set   t.status='Completed',
-          t.status_testing='Тестирование завершено',
+    set   t.status_testing='Completed',
           t.end_time_testing=systimestamp
     where t.status='Active'
     and t.id_person=iid_person;
     commit;
-    return 'Completed';
   end;
 
 
@@ -267,10 +299,63 @@ create or replace package body test is
     return omess;
   end;
   
-  procedure get_result(iid_person in number)
-  is 
+  procedure get_personal_info( iid_person in number, oid_reg out number, 
+                             oiin out varchar2, otime_beg out date,
+                             otime_end out date, ofio out nvarchar2 )
+  is                             
   begin
-    log('Get Result for: '||iid_person);
+    select t.id_registration, 
+           p.iin, beg_time_testing, end_time_testing, fio
+    into oid_reg, oiin, otime_beg, otime_end, ofio
+    from persons p, testing t
+    where p.id_person=iid_person
+    and   p.id_person=t.id_person
+    and   t.status='Active';
+  end;
+
+  procedure get_personal_info( iid_registration in number, 
+                             oiin out varchar2, otime_beg out date,
+                             otime_end out date, ofio out nvarchar2 )
+  is                             
+  begin
+    select p.iin, beg_time_testing, end_time_testing, fio
+    into oiin, otime_beg, otime_end, ofio
+    from persons p, testing t
+    where t.id_registration=iid_registration
+    and   p.id_person=t.id_person
+    and   t.status='Active';
+    exception when no_data_found 
+      then begin
+        oiin:='';
+        otime_beg:='';
+        otime_end:='';
+        ofio:='';
+      end;
+  end;
+
+                                 
+  function get_result(iid_registration in number) return sys_refcursor
+  is 
+    rf_cur sys_refcursor;
+  begin
+      open rf_cur for
+          select theme_number, descr, count_question, count_success,
+                 sum(true_result) true_score,
+                 sum(false_result) false_score
+          from(       
+          select th.id_theme, theme_number, th.descr, tft.count_question, tft.count_success,
+                 case when correctly='Y' then 1 else 0 end true_result,
+                 case when correctly!='Y' then 1 else 0 end false_result
+          from questions_for_testing qft, answers a,
+               themes_for_testing tft, themes th
+          where qft.id_registration=tft.id_registration
+          and qft.id_theme=th.id_theme
+          and a.id_answer(+)=qft.id_answer
+          and tft.id_registration=iid_registration
+          and   tft.id_theme=th.id_theme 
+          )
+          group by theme_number, count_question, count_success, descr;
+      return rf_cur;
   end;
 
 begin

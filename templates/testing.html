@@ -10,14 +10,26 @@
 
 {% block timer_area %}
     <p id="label_timer">Осталось: &nbsp</p>
-    <p id="timer">{{ remain_time }}</p>
-    <p id="label_sec">cек. </p>
+    <p id="timer" hidden>{{ remain_time }}</p>
+    <p id="timer_vis"></p>
+    <p id="label_sec">&nbspcек.</p>
     <script>
     setInterval(myTimer, 1000);
     function myTimer() {
         let ticks = document.getElementById("timer").innerHTML
         if (ticks > 0) {
-            document.getElementById("timer").innerHTML = ticks - 1
+            ticks=ticks-1
+            document.getElementById("timer").innerHTML = (ticks).toString()
+            if(ticks<=60)
+                document.getElementById("timer_vis").innerHTML = Math.floor(ticks % 60).toString()
+            else {
+                if (ticks <= 3600)
+                    document.getElementById("timer_vis").innerHTML = Math.floor((ticks / 60) % 60).toString() + ':' +
+                        Math.floor(ticks % 60).toString()
+                else
+                    document.getElementById("timer_vis").innerHTML = Math.floor((ticks / 3600) % 24).toString() + ':' +
+                        Math.floor((ticks / 60) % 60).toString() + ':' + Math.floor(ticks % 60).toString()
+            }
         }
     }
     </script>

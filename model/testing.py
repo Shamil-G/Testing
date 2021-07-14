@@ -28,7 +28,7 @@ class ResultF(object):
 
 
 def have_test():
-    if cfg.debug_level > 1:
+    if cfg.debug_level > 2:
         print('Check have test for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
     con = get_connection()
     cursor = con.cursor()
@@ -39,7 +39,7 @@ def have_test():
 
 
 def get_theme():
-    if cfg.debug_level > 1:
+    if cfg.debug_level > 2:
         print('Get questions for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
     con = get_connection()
     cursor = con.cursor()
@@ -51,38 +51,43 @@ def get_theme():
 
 
 def navigate_question(command):
-    if cfg.debug_level > 1:
+    if cfg.debug_level > 2:
         print('1. Navigate Guestion: command' + str(command) + ' : ' + str(g.user.username)  )
     con = get_connection()
     cursor = con.cursor()
     remain_time = cursor.callfunc("test.navigate_question", str, [g.user.id_user, command])
-    if remain_time:
+    if cfg.debug_level > 3 and remain_time:
         print("Remain time: " + remain_time)
     cursor.close()
     con.close()
     return remain_time
 
 
-def finish_part(force_finish):
-    if cfg.debug_level > 1:
-        print('1. FINISH PART. command: ' + str(force_finish) + ' : ' + str(g.user.username))
+def finish_info():
+    if cfg.debug_level > 2:
+        print('1. FINISH PART. command: ' + str(g.user.username))
     con = get_connection()
     cursor = con.cursor()
-    mess = cursor.callfunc("test.finish_part", str, [g.user.id_user, force_finish])
-    if mess:
+    mess = cursor.callfunc("test.finish_info", str, [g.user.id_user])
+    if cfg.debug_level > 3 and mess:
         print("Got message: " + mess)
     cursor.close()
     con.close()
     return mess
 
 
-def finish_force():
-    mess = finish_part(1)
-    return
+def finish():
+    if cfg.debug_level > 2:
+        print('1. TESTING FINISHED. command: ' + str(g.user.username))
+    con = get_connection()
+    cursor = con.cursor()
+    cursor.callproc("test.finish", [g.user.id_user])
+    cursor.close()
+    con.close()
 
 
 def save_answer(order_num_question):
-    if cfg.debug_level > 1:
+    if cfg.debug_level > 2:
         print('1. Navigate Guestion: order_num_question: ' + str(order_num_question) + ' : ' + str(g.user.username)  )
     con = get_connection()
     cursor = con.cursor()
@@ -93,7 +98,7 @@ def save_answer(order_num_question):
 
 
 def get_quest():
-    if cfg.debug_level > 1:
+    if cfg.debug_level > 2:
         print('Get questions for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
     con = get_connection()
     cursor = con.cursor()
@@ -113,7 +118,7 @@ def get_quest():
 
 
 def get_answers():
-    if cfg.debug_level > 1:
+    if cfg.debug_level > 2:
         print('Get answer for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
     con = get_connection()
     cursor = con.cursor()
@@ -137,7 +142,7 @@ def get_answers():
 
 
 def get_result_info():
-    if cfg.debug_level > 1:
+    if cfg.debug_level > 2:
         print('Get Result Info: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
     con = get_connection()
     cursor = con.cursor()
@@ -147,12 +152,12 @@ def get_result_info():
     time_end = cursor.var(cx_Oracle.DB_TYPE_DATE)
     fio = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
     cursor.callproc('test.get_personal_info', (g.user.id_user, id_reg, iin, time_beg, time_end, fio))
-    print('Got result info ' + fio.getvalue())
+    print('Got result info ' + fio.getvalue() + ', time_end: ' + str(time_end.getvalue()))
     return id_reg.getvalue(), iin.getvalue(), time_beg.getvalue(), time_end.getvalue(), fio.getvalue()
 
 
 def get_result(id_registration):
-    if cfg.debug_level > 1:
+    if cfg.debug_level > 2:
         print('Get answer for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
     con = get_connection()
     cursor = con.cursor()

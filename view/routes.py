@@ -9,7 +9,6 @@ from main_app import app
 import cx_Oracle
 import config as cfg
 
-remain_test_sec = 0
 
 if cfg.debug_level > 0:
     print("Routes стартовал...")
@@ -35,13 +34,13 @@ def view_models():
                     print("Повторная регистрация....")
                     login_user(user)
                     print("Зарегистрировались....")
-                    global remain_test_sec
-                    # remain_test_sec = have_test()
-                    remain_test_sec = 10
                     print("Проверяем оставшееся время....")
-                    if remain_test_sec and int(remain_test_sec) > 0:
-                        print("Идем на тестироавние")
+                    if user.remain_time and user.remain_time > 0:
+                        print("Идем на тестирование")
                         return redirect("/testing")
+                    if user.remain_time and user.remain_time <= 0:
+                        print("!!!!  Тестирование завершено")
+                        return redirect("/result")
             flash("Пользователь в системе не существует")
             print("Возвращаемся на регистрацию ...")
             return redirect("/")
@@ -67,32 +66,37 @@ def view_finish():
 def view_finish_part():
     if cfg.debug_level > 3:
         print("VIEW FINISH PART. Finish testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username)
-    mess = finish_part(0)
-    if mess == 'Completed':
-        return redirect(url_for('view_result'))
+    # if mess == 'Completed':
+    #     return redirect(url_for('view_result'))
     return render_template("finish.html")
 
 
 @app.route('/testing')
 @login_required
 def view_test():
-    global remain_test_sec
     if cfg.debug_level > 1:
-        print("+++ Testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username + ', remain_time: ' + str(remain_test_sec))
-    return render_template("testing.html", remain_time=remain_test_sec, theme=get_theme(), questions=get_quest(), answers=get_answers())
+        print("+++ Testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username + ', remain_time: ' + str(g.user.remain_time))
+    if g.user.remain_time == 0:
+        return redirect(url_for('view_result'))
+    return render_template("testing.html", remain_time=g.user.remain_time, theme=get_theme(), questions=get_quest(), answers=get_answers())
 
 
 @app.route('/testing/<int:command>')
 @login_required
 def view_change_question(command):
-    if cfg.debug_level > 3:
+    if cfg.debug_level > 1:
         print("Change question. Id user: "+str(g.user.id_user)+" : "+str(command))
-    global remain_test_sec
     remain_test_sec = navigate_question(command)
+    print("!!! Change question. Id user: " + str(g.user.id_user) + " : " + str(remain_test_sec))
+    if int(remain_test_sec) == 0:
+        print("!!! Change question. STATUS: 0")
+        return redirect(url_for('view_result'))
     if int(remain_test_sec) == -100:
+        print("!!! Change question. STATUS: -100")
         return redirect(url_for('view_finish_part'))
     if int(remain_test_sec) < 0:
-        finish_force()
+        print("!!! Change question. STATUS: < 0")
+        finish()
         return redirect(url_for('view_result'))
     return redirect(url_for('view_test'))
 
@@ -109,10 +113,11 @@ def view_save_answer(order_num_answer):
 @app.route('/result')
 @login_required
 def view_result():
+    finish()
     id_reg, iin, time_beg, time_end, fio = get_result_info()
     ft_beg = time_beg.strftime('%d.%m.%Y  %H:%M:%S')
     ft_end = time_end.strftime('%d.%m.%Y  %H:%M:%S')
     result_file = print_result_test(id_reg)
     if cfg.debug_level > 1:
-        print("+++ VIEW RESULT. Id REG: "+str(id_reg)+" : " + fio + ', remain_time: ' + remain_test_sec)
+        print("+++ VIEW RESULT. Id REG: "+str(id_reg)+" : " + fio + ', remain_time: ' + str(ft_end))
     return render_template("result.html", result_file=result_file, fio=fio, iin=iin, id_reg=id_reg, time_beg=ft_beg, time_end=ft_end,  cursor=get_result(id_reg))
