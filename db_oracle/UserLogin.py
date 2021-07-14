@@ -58,12 +58,12 @@ class User:
         remain_time = cursor.var(cx_Oracle.DB_TYPE_NUMBER)
         message = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
 
-        cursor.callproc('cop.login', (user_name, id_user, remain_time, message))
-        if message.getvalue() is None:
-            self.id_user = id_user.getvalue()
-            self.username = user_name
-            self.remain_time = remain_time.getvalue()
-            self.password = ''
+        print('++++ вызываем процедуру регистрации: ')
+        cursor.callproc('cop.login', (user_name, id_user, remain_time))
+        self.id_user = id_user.getvalue()
+        self.username = user_name
+        self.remain_time = remain_time.getvalue()
+        self.password = ''
         print('Остаток времени: ' + str(self.remain_time))
         cursor.close()
         conn.close()
