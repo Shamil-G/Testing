@@ -5,7 +5,7 @@ create or replace package cop is
   -- Purpose :
 
   -- Public type declarations
-  procedure login(uname in nvarchar2, iid_user out number, iremain_time out number, imessage out nvarchar2);
+  procedure login(uname in nvarchar2, oid_user out number, oremain_time out number);
   procedure login_admin(uname in nvarchar2, upass out nvarchar2, oid_user out number);
   procedure new_user2(uname in nvarchar2, upass in nvarchar2, iid_creator in number, imess out nvarchar2);
 
@@ -14,7 +14,7 @@ end cop;
 /
 create or replace package body cop is
 
-  procedure login(uname in nvarchar2, iid_user out number, iremain_time out number, imessage out nvarchar2)
+  procedure login(uname in nvarchar2, oid_user out number, oremain_time out number)
   is
     r_testing  testing%rowtype;
     
@@ -22,18 +22,18 @@ create or replace package body cop is
   begin
     insert into protocol(event_date, message) values(CURRENT_TIMESTAMP, 'COP.LOGIN for: '||uname);
     commit;
-    select u.id_person into iid_user
+    select u.id_person into oid_user
     from persons u where u.iin=uname;
 
     begin
       select * 
       into r_testing 
       from testing t 
-      where t.id_person=iid_user and t.status='Active';
+      where t.id_person=oid_user and t.status='Active';
 
-      iremain_time := ( extract(second from r_testing.beg_time_testing - systimestamp) + 
-                        extract(minute from r_testing.beg_time_testing - systimestamp)*60 + 
-                        extract(hour from r_testing.beg_time_testing - systimestamp)*3600 + 
+      oremain_time := ( extract(second from coalesce(r_testing.beg_time_testing,systimestamp) - systimestamp) + 
+                        extract(minute from coalesce(r_testing.beg_time_testing,systimestamp) - systimestamp)*60 + 
+                        extract(hour from coalesce(r_testing.beg_time_testing,systimestamp) - systimestamp)*3600 + 
                         r_testing.period_for_testing  );
       
       if r_testing.beg_time_testing is null then
@@ -45,20 +45,19 @@ create or replace package body cop is
       end if;
       exception when no_data_found then 
       begin
-          insert into protocol(event_date, message) values(CURRENT_TIMESTAMP, '++ Error login: '||uname);
+          insert into protocol(event_date, message) values(CURRENT_TIMESTAMP, '--- “естируемый отсутствует в тестах: '||uname);
           commit;
-          imessage := 'Error login or password '||uname;
+          oremain_time:=-100;
       end;
     end;
 
-    insert into protocol(event_date, message) values(CURRENT_TIMESTAMP, 'COP.LOGIN Success: '||uname||' : '||iid_user);
+    insert into protocol(event_date, message) values(CURRENT_TIMESTAMP, 'COP.LOGIN Success: '||uname||' : '||oid_user);
     commit;
     exception when no_data_found then 
       begin
-          insert into protocol(event_date, message) values(CURRENT_TIMESTAMP, '++ Error login: '||uname);
+          insert into protocol(event_date, message) values(CURRENT_TIMESTAMP, '--- “естируемый отсутствует в справочнике: '||uname);
           commit;
-          imessage := 'Error login or password '||uname;
-          iremain_time:=0;
+          oremain_time:=-200;
       end;
   end;
 
