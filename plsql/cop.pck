@@ -30,11 +30,17 @@ create or replace package body cop is
       into r_testing 
       from testing t 
       where t.id_person=oid_user and t.status='Active';
-
-      oremain_time := ( extract(second from coalesce(r_testing.beg_time_testing,systimestamp) - systimestamp) + 
-                        extract(minute from coalesce(r_testing.beg_time_testing,systimestamp) - systimestamp)*60 + 
-                        extract(hour from coalesce(r_testing.beg_time_testing,systimestamp) - systimestamp)*3600 + 
-                        r_testing.period_for_testing  );
+      
+      if r_testing.status_testing='Completed'
+      then
+        oremain_time:=0;
+      else
+        oremain_time := ( extract(second from coalesce(r_testing.beg_time_testing,systimestamp) - systimestamp) + 
+                          extract(minute from coalesce(r_testing.beg_time_testing,systimestamp) - systimestamp)*60 + 
+                          extract(hour from coalesce(r_testing.beg_time_testing,systimestamp) - systimestamp)*3600 + 
+                          r_testing.period_for_testing  );
+        if oremain_time<0 then oremain_time:=0; end if;
+      end if;
       
       if r_testing.beg_time_testing is null then
          update testing t

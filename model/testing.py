@@ -44,7 +44,8 @@ def get_theme():
     con = get_connection()
     cursor = con.cursor()
     theme = cursor.callfunc("test.get_theme", str, [g.user.id_user])
-    print("Got theme: " + theme)
+    if cfg.debug_level > 3:
+        print("Got theme: " + theme)
     cursor.close()
     con.close()
     return theme
@@ -52,12 +53,12 @@ def get_theme():
 
 def navigate_question(command):
     if cfg.debug_level > 2:
-        print('1. Navigate Guestion: command' + str(command) + ' : ' + str(g.user.username)  )
+        print('1. Navigate Guestion: command: ' + str(command) + ' : ' + str(g.user.username)  )
     con = get_connection()
     cursor = con.cursor()
     remain_time = cursor.callfunc("test.navigate_question", str, [g.user.id_user, command])
     if cfg.debug_level > 3 and remain_time:
-        print("Remain time: " + remain_time)
+        print("Remain time: " + str(remain_time))
     cursor.close()
     con.close()
     return remain_time

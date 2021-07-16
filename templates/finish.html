@@ -11,10 +11,21 @@
 {% block body %}
 <div class="div_login_page">
 <form class="form_register">
+    <div class="title_message">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for msg in messages %}
+                    <li>{{ msg }} </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    </div>
     <table>
         <tr>
             <a class="bt nav"  href="/result">{{ res_value('FINISH') }}</a>
-            <a class="bt nav"  href="/testing/0">{{ res_value('RETURN_FOR_CHECK') }}</a>
+            <a class="bt nav"  href="/testing/5">{{ res_value('RETURN_FOR_CHECK') }}</a>
         </tr>
     </table>
 </form>

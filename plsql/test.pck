@@ -10,7 +10,7 @@ create or replace package test is
   procedure set_answer(iid_person in number, iorder_num_answer in number);
 
   procedure finish(iid_person in number);
-  function finish_info(iid_person in number, iforce_finish in number) return nvarchar2;
+  function finish_info(iid_person in number) return nvarchar2;
   function have_test(iid_person in number) return number;
   
   
@@ -160,7 +160,32 @@ create or replace package body test is
     if v_status_testing='Completed' then
        return 0;
     end if;
-    /* Идем в начало*/
+    /* Идем в начало, к первому неотвеченному вопросу */
+    if icommand=5 then
+        select order_num_question, id_theme
+        into v_cur_num_question, v_theme_number
+        from (
+            select q.order_num_question, tft.id_theme
+            from testing t, themes_for_testing tft, 
+                 questions_for_testing q
+            where t.id_registration=tft.id_registration
+            and   t.id_registration=q.id_registration
+            and   q.id_theme=tft.id_theme
+            and   t.id_person=1
+            and t.status='Active'
+            and coalesce(q.id_answer,0)=0
+            order by theme_number, order_num_question
+        )
+        where rownum=1;
+        
+       update testing t
+       set    t.current_num_question=v_cur_num_question,
+              t.id_current_theme=v_theme_number,
+              t.last_time_access=systimestamp
+       where  t.status='Active'
+       and    t.id_person=iid_person;
+    end if;
+    /* Идем в начало темы, к первому вопросу */
     if icommand=0 then
        update testing t
        set    t.current_num_question=1,
@@ -211,17 +236,19 @@ create or replace package body test is
     return v_remain_time;
   end;
 
-  function finish_info(iid_person in number, iforce_finish in number) return nvarchar2
+  function finish_info(iid_person in number) return nvarchar2
   is
     v_unanswered       pls_integer;
   begin
       select count(q.id_question) 
       into v_unanswered
-      from testing t, questions_for_testing q
-      where q.id_registration=t.id_registration
-      and   q.id_theme=t.id_current_theme
+      from testing t, themes_for_testing tft, 
+           questions_for_testing q
+      where t.id_registration=tft.id_registration
+      and   t.id_registration=q.id_registration
+      and   q.id_theme=tft.id_theme
+      and   t.id_person=iid_person
       and t.status='Active'
-      and t.id_person=iid_person
       and coalesce(q.id_answer,0)=0;
                         
       if v_unanswered>0 then
@@ -249,14 +276,18 @@ create or replace package body test is
 
   procedure finish(iid_person in number)
   is
-    v_unanswered       pls_integer;
+    rec_testing        testing%rowtype;
   begin
-    update testing t
-    set   t.status_testing='Completed',
-          t.end_time_testing=systimestamp
-    where t.status='Active'
-    and t.id_person=iid_person;
-    commit;
+    select * into rec_testing from testing t where t.status='Active' and t.id_person=iid_person;
+    
+    if rec_testing.status_testing!='Completed'
+    then
+        update testing t
+        set   t.status_testing='Completed',
+              t.end_time_testing=systimestamp
+        where t.id_registration=rec_testing.id_registration;
+        commit;
+    end if;
   end;
 
 

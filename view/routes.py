@@ -29,20 +29,22 @@ def view_models():
         try:
             if username:
                 user = User().get_user_by_name(username)
-                print("Первая регистрация прошла....")
+                if cfg.debug_level > 2:
+                    print("Первая регистрация прошла....")
                 if user is not None:
-                    print("Повторная регистрация....")
+                    if cfg.debug_level > 2:
+                        print("Повторная регистрация....")
                     login_user(user)
-                    print("Зарегистрировались....")
-                    print("Проверяем оставшееся время....")
                     if user.remain_time and user.remain_time > 0:
-                        print("Идем на тестирование")
+                        if cfg.debug_level > 2:
+                            print("Идем на тестирование")
                         return redirect("/testing")
                     if user.remain_time and user.remain_time <= 0:
-                        print("!!!!  Тестирование завершено")
+                        if cfg.debug_level > 2:
+                            print("!!!!  Тестирование завершено")
                         return redirect("/result")
             flash("Пользователь в системе не существует")
-            print("Возвращаемся на регистрацию ...")
+            print("Пользователь в системе не существует. Возвращаемся на регистрацию ...")
             return redirect("/")
         except cx_Oracle.IntegrityError as e:
             errorObj, = e.args
@@ -66,7 +68,9 @@ def view_finish():
 def view_finish_part():
     if cfg.debug_level > 3:
         print("VIEW FINISH PART. Finish testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username)
-    # if mess == 'Completed':
+    mess = finish_info()
+    if mess != '':
+        flash(mess)
     #     return redirect(url_for('view_result'))
     return render_template("finish.html")
 
@@ -74,7 +78,7 @@ def view_finish_part():
 @app.route('/testing')
 @login_required
 def view_test():
-    if cfg.debug_level > 1:
+    if cfg.debug_level > 3:
         print("+++ Testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username + ', remain_time: ' + str(g.user.remain_time))
     if g.user.remain_time == 0:
         return redirect(url_for('view_result'))
@@ -84,20 +88,15 @@ def view_test():
 @app.route('/testing/<int:command>')
 @login_required
 def view_change_question(command):
-    if cfg.debug_level > 1:
-        print("Change question. Id user: "+str(g.user.id_user)+" : "+str(command))
-    remain_test_sec = navigate_question(command)
-    print("!!! Change question. Id user: " + str(g.user.id_user) + " : " + str(remain_test_sec))
-    if int(remain_test_sec) == 0:
-        print("!!! Change question. STATUS: 0")
+    g.user.remain_time = navigate_question(command)
+    if cfg.debug_level > 3:
+        print("Change question. Id user: "+str(g.user.id_user)+" : "+str(command) + ', remain_time: ' + str(g.user.remain_time))
+    # Время истекло полностью на все темы
+    if int(g.user.remain_time) == 0:
         return redirect(url_for('view_result'))
-    if int(remain_test_sec) == -100:
-        print("!!! Change question. STATUS: -100")
+    # Закончилась одна тема
+    if int(g.user.remain_time) == -100:
         return redirect(url_for('view_finish_part'))
-    if int(remain_test_sec) < 0:
-        print("!!! Change question. STATUS: < 0")
-        finish()
-        return redirect(url_for('view_result'))
     return redirect(url_for('view_test'))
 
 

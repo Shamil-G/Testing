@@ -50,27 +50,23 @@ class User:
                 print("Role: " + role)
 
     def get_user_by_name(self, user_name):
-        if cfg.debug_level > 0:
+        if cfg.debug_level > 2:
             print("++++ get_user_by_name: " + user_name)
         conn = get_connection()
         cursor = conn.cursor()
         id_user = cursor.var(cx_Oracle.DB_TYPE_NUMBER)
         remain_time = cursor.var(cx_Oracle.DB_TYPE_NUMBER)
-        message = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
-
-        print('++++ вызываем процедуру регистрации: ')
+        self.username = user_name
         cursor.callproc('cop.login', (user_name, id_user, remain_time))
         self.id_user = id_user.getvalue()
-        self.username = user_name
         self.remain_time = remain_time.getvalue()
-        self.password = ''
         print('Остаток времени: ' + str(self.remain_time))
         cursor.close()
         conn.close()
         if self.id_user is None:
             return None
         else:
-            print('+++ 3. LOGIN: ' + str(self.username) + ' ' + str(self.id_user) + ' ' + str(message.getvalue()))
+            print('+++ 3. LOGIN: ' + str(self.username) + ' ' + str(self.id_user) )
             return self
 
     def have_role(self, role_name):
