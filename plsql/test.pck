@@ -162,21 +162,38 @@ create or replace package body test is
     end if;
     /* Идем в начало, к первому неотвеченному вопросу */
     if icommand=5 then
-        select order_num_question, id_theme
-        into v_cur_num_question, v_theme_number
-        from (
-            select q.order_num_question, tft.id_theme
-            from testing t, themes_for_testing tft, 
-                 questions_for_testing q
-            where t.id_registration=tft.id_registration
-            and   t.id_registration=q.id_registration
-            and   q.id_theme=tft.id_theme
-            and   t.id_person=1
-            and t.status='Active'
-            and coalesce(q.id_answer,0)=0
-            order by theme_number, order_num_question
-        )
-        where rownum=1;
+       begin
+          select order_num_question, id_theme
+          into v_cur_num_question, v_theme_number
+          from (
+              select q.order_num_question, tft.id_theme
+              from testing t, themes_for_testing tft, 
+                   questions_for_testing q
+              where t.id_registration=tft.id_registration
+              and   t.id_registration=q.id_registration
+              and   q.id_theme=tft.id_theme
+              and   t.id_person=1
+              and t.status='Active'
+              and coalesce(q.id_answer,0)=0
+              order by theme_number, order_num_question
+          )
+          where rownum=1;
+       exception when no_data_found then
+          select order_num_question, id_theme
+          into v_cur_num_question, v_theme_number
+          from (
+              select q.order_num_question, tft.id_theme
+              from testing t, themes_for_testing tft, 
+                   questions_for_testing q
+              where t.id_registration=tft.id_registration
+              and   t.id_registration=q.id_registration
+              and   q.id_theme=tft.id_theme
+              and   t.id_person=1
+              and t.status='Active'
+              order by theme_number, order_num_question
+          )
+          where rownum=1;
+       end;
         
        update testing t
        set    t.current_num_question=v_cur_num_question,

@@ -1,7 +1,8 @@
 APP_NAME = Тестирование
-FIRST_QUESTION = <<  В начало
-FINISH_TESTING = Конец тестирования
 FINISH = Завершить тестироавние
+FINISH_TESTING = Завершение тестирования
+FIRST_QUESTION = <<  В начало
+FINISH_SURE = Вы уверены, что хотите завершить тестирование?
 RETURN_FOR_CHECK = Вернуться и проверить
 INSERT_IIN = ИИН
 INVITE_TO_TESTING =  Для перехода к тестированию

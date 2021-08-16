@@ -46,3 +46,11 @@ input[name="username"]:hover, input[name*="password"]:hover
     background-color: rgba(220, 215, 179, 0.27);
     box-shadow:0 0 15px 4px rgba(54, 85, 127, 0.2);
 }
+.select{
+  color: #763a12;
+    text-decoration: none;
+}
+.select:hover{
+    /*text-decoration: underline;*/
+  /*color: mediumblue;*/
+}

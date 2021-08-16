@@ -63,6 +63,14 @@ def view_finish():
     return render_template("finish.html")
 
 
+@app.route('/finish-approve')
+@login_required
+def view_finish_approve():
+    if cfg.debug_level > 1:
+        print("VIEW FINISH. Finish testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username)
+    return render_template("finish-approve.html")
+
+
 @app.route('/finish/part')
 @login_required
 def view_finish_part():

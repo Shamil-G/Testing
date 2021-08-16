@@ -52,12 +52,12 @@
         {% for el in answers %}
             <br><br>
             {% if el.selected == 'Y' %}
-                <input name="select" style="text-decoration: none;" type="radio" id="{{ el.order_num_answer }}"  value="{{ el.order_num_answer }}" checked>
+                <input name="select" type="radio" id="{{ el.order_num_answer }}"  value="{{ el.order_num_answer }}" checked>
             {% else %}
-                <input name="select" style="text-decoration: none;" type="radio" id="{{ el.order_num_answer }}"  value="{{ el.order_num_answer }}" disabled>
+                <input name="select" type="radio" id="{{ el.order_num_answer }}"  value="{{ el.order_num_answer }}" disabled>
             {% endif %}
             <label for="{{ el.order_num_answer }}"></label>
-            <a  href="/testing/save/{{ el.order_num_answer }}">{{ el.order_num_answer }}.  {{ el.answer }}</a>
+            <a  class="select" href="/testing/save/{{ el.order_num_answer }}">{{ el.order_num_answer }}.  {{ el.answer }}</a>
         {% endfor %}
     </div>
 {% endblock %}

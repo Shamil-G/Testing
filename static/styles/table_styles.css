@@ -9,7 +9,8 @@
 .answer{
     margin: 20px;
     padding: 10px;
-    color: var(--base-color-text);
+    /*color: var(--base-color-text);*/
+    color: black;
     font-weight: normal;
     width: 100%;
 }

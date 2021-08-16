@@ -1,11 +1,12 @@
 APP_NAME = Тестирование
 FINISH = Завершить тест
-FINISH_TESTING = Завершить тестирование?
-FIRST_QUESTION = <<  В начало
+FINISH_TESTING = Завершение тестирования
+FIRST_QUESTION = <<  В начало раздела
+FINISH_SURE = Вы уверены, что хотите завершить тестирование?
 INSERT_IIN = ИИН:
 INVITE_TO_TESTING =  Для перехода к тестированию
-LAST_QUESTION = В конец  >>
-NEXT_QUESTION =  Следующий  >
+LAST_QUESTION = В конец раздела  >>
+NEXT_QUESTION =  Далее  >
 PASSWORD = Пароль:
 PREV_QUESTION = <  Предыдущий
 REGISTER_NEW_EMPLOYEE = Регистрация пользователя перед началом тестирования

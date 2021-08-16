@@ -15,7 +15,7 @@ create or replace package admin is
   procedure theme_update(iid_task in number, iid_theme in number, itheme_name in varchar2, itheme_number in number, 
             icount_question in number, icount_success in number );
   procedure theme_delete(iid_theme in number);
-  procedure load_person(iid_task in number, iiin in varchar2, ifio in nvarchar2);
+  procedure load_person(iid_task in number, iiin in varchar2, ifio in nvarchar2, idepart in nvarchar2);
   procedure clean_all;
 
 end admin;
@@ -188,6 +188,7 @@ create or replace package body admin is
                0, 0, 0);
     end loop;
 
+    log('ADD TEST. Themes for testing loaded. Person id_person:  '||iid_person||', id_registration: '||v_id_registration);
 /* Загрузим вопросы для каждой темы */
     for cur in ( select * from themes_for_testing tt where tt.id_registration=v_id_registration)
     loop
@@ -198,7 +199,7 @@ create or replace package body admin is
         
         random_size:=input_array_questions.count;
         if random_size=0 THEN 
-           log('4.1 ADD TEST. THEME with id_theme: '||cur.id_theme||' has an outstanding questions');
+           log('ADD TEST. THEME with id_theme: '||cur.id_theme||' has an outstanding questions');
            return; 
         end if;
         target_size := cur.count_question;
@@ -207,12 +208,11 @@ create or replace package body admin is
         l_seed := TO_CHAR(SYSTIMESTAMP,'FFFF');
         DBMS_RANDOM.seed (val => l_seed);
 
-        while order_number<target_size
+        while order_number<target_size and target_size<=random_size
         loop
-          select dbms_random.value(1,random_size-order_number) into random_number from dual;
+          select dbms_random.value(1,random_size) into random_number from dual;
           if input_array_questions.exists(random_number)
           then
-            log('Remain questions: '||input_array_questions.count);
              v_id_question:=input_array_questions(random_number);
              input_array_questions.delete(random_number);
              order_number:=order_number+1;
@@ -227,6 +227,7 @@ create or replace package body admin is
         end loop;
     end loop;
         
+    log('ADD TEST. Question for testing loaded. Person id_person:  '||iid_person||', id_registration: '||v_id_registration);
 /* Загрузим варианты ответов  */
 --/*
     for cur in ( select * from questions_for_testing qt where qt.id_registration=v_id_registration order by qt.id_theme, qt.order_num_question )
@@ -263,6 +264,7 @@ create or replace package body admin is
         end loop;
     end loop;
 
+    log('ADD TEST. Answers in testing loaded. Person id_person:  '||iid_person||', id_registration: '||v_id_registration);
     /* Отправим в архив предыдущие тестирования */
     update testing t
     set    t.status='Archived'
@@ -281,21 +283,24 @@ create or replace package body admin is
      
   end;
 
-  procedure load_person(iid_task in number, iiin in varchar2, ifio in nvarchar2)
+  procedure load_person(iid_task in number, iiin in varchar2, ifio in nvarchar2, idepart in nvarchar2)
   is
     v_id_person persons.id_person%type;
   begin
+    log('1. Load Person: '||iiin||' : '||ifio);
+
     if iiin is null then return; end if;
     if ifio is null then return; end if;
 
-    log('Load Person: '||iiin||' : '||ifio);
+    log('2. Load Person: '||iiin||' : '||ifio);
 
     select p.id_person into v_id_person from persons p where p.iin=iiin;
     add_test(iid_person => v_id_person, iid_task =>iid_task );
     exception when no_data_found then 
       begin
         select coalesce(max(id_person),0) into v_id_person from persons;
-        insert into persons(id_person, iin, fio) values(v_id_person+1, iiin, ifio);
+        log('Insert new Person: '||iiin||' : '||ifio);
+        insert into persons(id_person, iin, fio, depart) values(v_id_person+1, iiin, ifio, idepart);
         commit;
         add_test(iid_person => v_id_person+1, iid_task =>iid_task );
       end;
