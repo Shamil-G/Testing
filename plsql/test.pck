@@ -188,7 +188,7 @@ create or replace package body test is
               where t.id_registration=tft.id_registration
               and   t.id_registration=q.id_registration
               and   q.id_theme=tft.id_theme
-              and   t.id_person=1
+              and   t.id_person=id_person
               and t.status='Active'
               order by theme_number, order_num_question
           )
