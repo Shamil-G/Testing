@@ -10,6 +10,14 @@
     <div class = "common-testing-container">
         <header class="header">
             <div><a>{{ res_value('APP_NAME') }}</a></div>
+            <div><a></a></div>
+            <div class="header-r">
+                   {% if session['language'] == 'ru' %}
+                            <a href="/language/kz">ҚАЗ</a>
+                    {% else %}
+                            <a href="/language/ru">РУС</a>
+                   {% endif %}
+            </div>
         </header>
 
         <div class="article_title_init">
