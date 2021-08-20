@@ -130,9 +130,6 @@ create or replace package body test is
   
   procedure navigate_finish(iid_registration in pls_integer)
   is
-    v_count_question pls_integer;
-    v_theme_number     pls_integer;
-    v_id_theme         pls_integer;
   begin
        update testing t
        set    t.last_time_access=systimestamp,
@@ -153,6 +150,7 @@ create or replace package body test is
   begin
 --    insert into protocol(event_date,message) values(SYSTIMESTAMP, 'ПОлучена команда '|| icommand|| ', id_person: '||iid_person);
 --    commit;
+    begin
     /*Вытащим общее количество вопросов и оставшееся время для тестировния*/
      select tft.id_registration, tft.theme_number, tft.count_question, t.current_num_question, t.status_testing,
             ( extract(second from t.beg_time_testing - systimestamp) + 
@@ -166,7 +164,10 @@ create or replace package body test is
      and   tft.id_theme=t.id_current_theme
      and   t.status='Active'       
      and   t.id_person=iid_person;
-
+    exception when no_data_found then
+      log('Navigate_question. Error! Absend DATA for testing!');
+      return 0;
+    end;
     log('1. navigate_question. id_person: '||iid_person||' : '||icommand||' id_registration: '||v_id_registration||
             ', theme_number: '||v_theme_number||', num_question: '||v_cur_num_question||', time remain: '||v_remain_time);
 
@@ -305,21 +306,7 @@ create or replace package body test is
          insert into protocol(event_date,message) 
                 values(SYSTIMESTAMP, 'Имеются неотвеченные вопросы. id_person: '|| iid_person ||', в количестве: ' ||v_unanswered);
          commit;
-        if v_unanswered=1 or v_unanswered=21 or v_unanswered=31 or 
-           v_unanswered=41 or v_unanswered=51 or v_unanswered=61  
-           then
-             return 'Имется '||v_unanswered||' неотвеченный вопрос!';
-        end if;
-        if v_unanswered<5 or 
-                v_unanswered between 22 and 24 or
-                v_unanswered between 32 and 34 or
-                v_unanswered between 42 and 44 or
-                v_unanswered between 52 and 54 or
-                v_unanswered between 62 and 64
-        then
-                return 'Имется '||v_unanswered||' неотвеченных вопроса!';
-        end if;
-        return 'Имется '||v_unanswered||' неотвеченных вопросов!';
+         return to_char(v_unanswered);
       end if;
       return '';
   end;

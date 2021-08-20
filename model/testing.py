@@ -71,7 +71,7 @@ def finish_info():
     cursor = con.cursor()
     mess = cursor.callfunc("test.finish_info", str, [g.user.id_user])
     if cfg.debug_level > 3 and mess:
-        print("Got message: " + mess)
+        print("Having unanswered question: " + mess)
     cursor.close()
     con.close()
     return mess

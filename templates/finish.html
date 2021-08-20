@@ -16,7 +16,7 @@
         <ul class="flashes">
             {% for msg in messages %}
                 {% if msg %}
-                <li>{{ msg }}</li>
+                <li>{{ res_value('HAVING_UNANSWERED_QUESTIONS') }}: {{ msg }}</li>
                 {% endif %}
             {% endfor %}
         </ul>

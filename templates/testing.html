@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block timer_area %}
-    <p id="label_timer">Осталось: &nbsp</p>
+    <p id="label_timer">{{ res_value('REMAIN_TIME') }}: &nbsp</p>
     <p id="timer" hidden>{{ remain_time }}</p>
     <p id="timer_vis"></p>
     <p id="label_sec">&nbspcек.</p>

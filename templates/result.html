@@ -23,12 +23,12 @@
         </h1>
         <table>
             <tbody>
-            <tr style="margin-top: 15px;">
-                <td><p style="margin-left: 14px;">Ид:</p></td>
-                <td><p>{{ id_reg }}</p></td>
-            </tr>
+<!--            <tr style="margin-top: 15px;">-->
+<!--                <td><p style="margin-left: 14px;">Ид:</p></td>-->
+<!--                <td><p>{{ id_reg }}</p></td>-->
+<!--            </tr>-->
             <tr>
-                <td><p style="margin-left: 14px;">ИИН:&ensp;</p></td>
+                <td><p style="margin-left: 14px;">{{ res_value('IIN') }}:&ensp;</p></td>
                 <td><p>{{ iin }}</p></td>
             </tr>
             </tbody>
@@ -36,11 +36,11 @@
         <table>
             <tbody>
             <tr style="margin-left: 14px; margin-top: 10px;">
-                <td><p style="margin-left: 14px; margin-top: 3px;">Начало тестирования:</p></td>
+                <td><p style="margin-left: 14px; margin-top: 3px;">{{ res_value('TIME_BEG') }}:</p></td>
                 <td><p>{{ time_beg }}</p></td>
             </tr>
-            <tr>
-                <td><p style="margin-left: 14px;">Окончание тестирования:&ensp;</p></td>
+            <tr style="margin-left: 14px; margin-top: 10px;">
+                <td><p style="margin-left: 14px; margin-top: 3px;">{{ res_value('TIME_END') }}:</p></td>
                 <td><p>{{ time_end }}</p></td>
             </tr>
             </tbody>
