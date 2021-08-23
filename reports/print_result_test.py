@@ -88,8 +88,8 @@ def print_result_test(id_registration):
         worksheet.write(row + 8, 2, record.theme_name, theme_name_format)
         worksheet.write(row + 8, 4, record.count_question, common_format)
         worksheet.write(row + 8, 5, record.count_success, common_format)
-        worksheet.write(row + 8, 6, record.true_score, common_format)
-        worksheet.write(row + 8, 7, record.false_score, common_format)
+        worksheet.write(row + 8, 5, record.true_score, common_format)
+        worksheet.write(row + 8, 6, record.false_score, common_format)
         row += 1
 
     worksheet.write(row + 8 + 1, 1, now.strftime("%d.%m.%Y %H:%M:%S"))

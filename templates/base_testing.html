@@ -13,9 +13,9 @@
             <div><a></a></div>
             <div class="header-r">
                    {% if session['language'] == 'ru' %}
-                            <a href="/language/kz">ҚАЗ</a>
+                            <a href="/language/kz">{{ res_value('GOTO_KAZ_LANG') }}</a>
                     {% else %}
-                            <a href="/language/ru">РУС</a>
+                            <a href="/language/ru">{{ res_value('GOTO_RUS_LANG') }}</a>
                    {% endif %}
             </div>
         </header>
@@ -40,7 +40,7 @@
                  <small>© 2021</small>
               </div>
               <div class="footer-r">
-                  <a style="font-size:14px">{% if g.user.is_authenticated %} {{ g.user.username }} {% endif %}</a>
+                  <a style="font-size:14px">{% if g.user.is_authenticated %} {{ res_value('USER_IDENTIFY')}}:&nbsp{{ g.user.username }} {% endif %}</a>
               </div>
         </footer>
     </div>

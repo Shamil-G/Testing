@@ -124,7 +124,8 @@ def view_result():
     id_reg, iin, time_beg, time_end, fio = get_result_info()
     ft_beg = time_beg.strftime('%d.%m.%Y  %H:%M:%S')
     ft_end = time_end.strftime('%d.%m.%Y  %H:%M:%S')
-    result_file = print_result_test(id_reg)
+    # В печатном виде отчет не выдавать
+    # result_file = print_result_test(id_reg)
     if cfg.debug_level > 1:
         print("+++ VIEW RESULT. Id REG: "+str(id_reg)+" : " + fio + ', remain_time: ' + str(ft_end))
     return render_template("result.html", result_file=result_file, fio=fio, iin=iin, id_reg=id_reg, time_beg=ft_beg, time_end=ft_end,  cursor=get_result(id_reg))

@@ -24,7 +24,9 @@
     </div>
     <table>
         <tr>
+            {% if not message %}
             <a class="bt nav"  href="/finish-approve">{{ res_value('FINISH') }}</a>
+            {% endif %}
             <a class="bt nav"  href="/testing/5">{{ res_value('RETURN_FOR_CHECK') }}</a>
         </tr>
     </table>
