@@ -147,6 +147,7 @@ create or replace package body test is
    v_remain_time      pls_integer;
    v_id_registration  pls_integer;
    v_theme_number     pls_integer;
+   v_id_theme         pls_integer;
   begin
 --    insert into protocol(event_date,message) values(SYSTIMESTAMP, 'ПОлучена команда '|| icommand|| ', id_person: '||iid_person);
 --    commit;
@@ -240,22 +241,57 @@ create or replace package body test is
        commit;
        return v_remain_time;
     end if;
-    /* Идем в начало темы, к первому вопросу */
+    /* Идем в начало тестирования, к первому вопросу */
     if icommand=0 then
+       select id_theme 
+       into v_id_theme
+       from (
+           from themes_for_testing tft
+           where tft.id_registration=v_id_registration
+           order by tft.theme_number
+       )
+       where row_num=1;
+       
+       update testing t
+       set    t.current_num_question=1,
+              t.id_current_theme=v_id_theme,
+              t.last_time_access=systimestamp
+       where  t.id_registration=v_id_registration;
+    end if;
+    /* Идем в начало раздела, к первому вопросу */
+    if icommand=1 then
        update testing t
        set    t.current_num_question=1,
               t.last_time_access=systimestamp
        where  t.id_registration=v_id_registration;
     end if;
-    /* Идем в конец*/
-    if icommand=4 then
+    /* Идем в конец раздела*/
+    if icommand=11 then
        update testing t
        set    t.current_num_question=v_count_question,
               t.last_time_access=systimestamp
        where  t.id_registration=v_id_registration;
     end if;
     /* */
-    if icommand=3 then
+    /* Идем в начало тестирования, к первому вопросу */
+    if icommand=10 then
+       select id_theme 
+       into v_id_theme
+       from (
+           from themes_for_testing tft
+           where tft.id_registration=v_id_registration
+           order by tft.theme_number desc
+       )
+       where row_num=1;
+       
+       update testing t
+       set    t.current_num_question=v_count_question,
+              t.id_current_theme=v_id_theme,
+              t.last_time_access=systimestamp
+       where  t.id_registration=v_id_registration;
+    end if;
+    /* Следующий вопрос */
+    if icommand=12 then
        if v_cur_num_question=v_count_question then
           if next_theme(iid_person, icommand, v_id_registration, v_theme_number)=-100 then
               log('2. ABSENT NEXT THEME. navigate_question. id_person: '||iid_person||' : '||icommand||' id_registration: '||v_id_registration||
@@ -269,8 +305,8 @@ create or replace package body test is
           where  t.id_registration=v_id_registration;
        end if;
     end if;
-
-    if icommand=1 then
+    /* Предыдущий вопрос */
+    if icommand=2 then
        if v_cur_num_question=1 then
          if next_theme(iid_person, icommand, v_id_registration, v_theme_number)=-50 then
            return -50;
