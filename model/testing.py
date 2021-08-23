@@ -176,7 +176,8 @@ def get_result(id_registration):
           'and tft.id_registration = :id ' \
           'and tft.id_theme = th.id_theme ' \
           ') ' \
-          'group by theme_number, count_question, count_success, descr'
+          'group by theme_number, count_question, count_success, descr ' \
+          'order by theme_number'
     cursor.execute(cmd, [id_registration])
     cursor.rowfactory = ResultF
     return cursor
