@@ -114,7 +114,9 @@ def view_save_answer(order_num_answer):
     if cfg.debug_level > 3:
         print("Save answer. Id user: "+str(g.user.id_user)+" : "+str(order_num_answer))
     save_answer(order_num_answer)
-    return redirect(url_for('view_change_question', command=3))
+    if cfg.move_at_once and cfg.move_at_once == 'False':
+        return redirect(url_for('view_change_question', command=1024))
+    return redirect(url_for('view_change_question', command=12))
 
 
 @app.route('/result')
@@ -128,4 +130,5 @@ def view_result():
     # result_file = print_result_test(id_reg)
     if cfg.debug_level > 1:
         print("+++ VIEW RESULT. Id REG: "+str(id_reg)+" : " + fio + ', remain_time: ' + str(ft_end))
-    return render_template("result.html", result_file=result_file, fio=fio, iin=iin, id_reg=id_reg, time_beg=ft_beg, time_end=ft_end,  cursor=get_result(id_reg))
+    return render_template("result.html", fio=fio, iin=iin, id_reg=id_reg, time_beg=ft_beg, time_end=ft_end,  cursor=get_result(id_reg))
+    # return render_template("result.html", result_file=result_file, fio=fio, iin=iin, id_reg=id_reg, time_beg=ft_beg, time_end=ft_end,  cursor=get_result(id_reg))

@@ -92,8 +92,7 @@ create or replace package body test is
   is
     row_tft         themes_for_testing%rowtype;
   begin
-    log('NEXT_THEME. id_person: '||iid_person||' : '||icommand);  
-    if icommand=1 and itheme_number>1 then
+    if icommand=2 and itheme_number>1 then
       begin
         select tft.* into row_tft
         from themes_for_testing tft 
@@ -108,7 +107,7 @@ create or replace package body test is
         exception when no_data_found then return -50;
       end;
     end if;
-    if icommand=3 then
+    if icommand=12 then
       begin
         select tft.* into row_tft
         from themes_for_testing tft 
@@ -246,11 +245,12 @@ create or replace package body test is
        select id_theme 
        into v_id_theme
        from (
+           select tft.id_theme
            from themes_for_testing tft
            where tft.id_registration=v_id_registration
            order by tft.theme_number
        )
-       where row_num=1;
+       where rownum=1;
        
        update testing t
        set    t.current_num_question=1,
@@ -278,11 +278,12 @@ create or replace package body test is
        select id_theme 
        into v_id_theme
        from (
+           select tft.id_theme
            from themes_for_testing tft
            where tft.id_registration=v_id_registration
            order by tft.theme_number desc
        )
-       where row_num=1;
+       where rownum=1;
        
        update testing t
        set    t.current_num_question=v_count_question,
@@ -292,6 +293,7 @@ create or replace package body test is
     end if;
     /* Следующий вопрос */
     if icommand=12 then
+      
        if v_cur_num_question=v_count_question then
           if next_theme(iid_person, icommand, v_id_registration, v_theme_number)=-100 then
               log('2. ABSENT NEXT THEME. navigate_question. id_person: '||iid_person||' : '||icommand||' id_registration: '||v_id_registration||
