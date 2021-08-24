@@ -41,11 +41,13 @@ create or replace package body test is
   procedure get_theme(iid_person in number, otheme_name out nvarchar2, ostatus_testing out nvarchar2)
   is
   begin
-    select th.descr, t.status_testing
+    select tft.theme_number || '. '|| th.descr, t.status_testing
     into otheme_name, ostatus_testing
-    from themes th, 
+    from themes th, themes_for_testing tft, 
          testing t
     where th.id_theme=t.id_current_theme
+    and t.id_registration=tft.id_registration
+    and t.id_current_theme=tft.id_theme
     and t.status='Active'
     and t.id_person=iid_person;
   end;
