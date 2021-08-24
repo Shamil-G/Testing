@@ -62,7 +62,11 @@
                 {% else %}
              <td><a class="title2"></a></td>
                 {% endif %}
+            {% if el.theme_number!=100 %}
              <td style="text-align: left"><a class="title2">{{ el.theme_name }}</a></td>
+            {% else %}
+             <td style="text-align: left"><a class="title2">{{ res_value('RESULT_SUMMARY') }}</a></td>
+            {% endif %}
              <td><a class="title2">{{ el.count_question }}</a></td>
 <!--             <td><a class="title2">{{ el.count_success }}</a></td>-->
              <td><a class="title2">{{ el.true_score }}</a></td>
