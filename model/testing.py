@@ -39,16 +39,14 @@ def have_test():
 
 
 def get_theme():
-    if cfg.debug_level > 2:
-        print('Get questions for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
     con = get_connection()
     cursor = con.cursor()
-    theme = cursor.callfunc("test.get_theme", str, [g.user.id_user])
-    if cfg.debug_level > 3:
-        print("Got theme: " + theme)
-    cursor.close()
-    con.close()
-    return theme
+    theme_name = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
+    status_testing = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
+    cursor.callproc('test.get_theme', (g.user.id_user, theme_name, status_testing))
+    if cfg.debug_level > 2:
+        print('Got theme info ' + theme_name.getvalue() + ', status_testing: ' + status_testing.getvalue())
+    return theme_name.getvalue(), status_testing.getvalue()
 
 
 def navigate_question(command):
@@ -124,8 +122,7 @@ def get_answers():
     con = get_connection()
     cursor = con.cursor()
     cmd = "select aft.order_num_answer, " \
-          "case when coalesce(q.id_answer,0)=aft.id_answer then 'Y' else 'N' end as selected, " \
-          "a.answer " \
+          "case when coalesce(q.id_answer,0)=aft.id_answer then 'Y' else 'N' end as selected, a.answer " \
           "from answers a, answers_in_testing aft, " \
           "testing t, questions_for_testing q " \
           "where a.id_question=q.id_question " \
@@ -162,22 +159,40 @@ def get_result(id_registration):
         print('Get answer for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
     con = get_connection()
     cursor = con.cursor()
-    cmd = 'select theme_number, descr as theme_name, count_question, count_success, ' \
-          'sum(true_result) true_score, sum(false_result) false_score ' \
-          'from ( ' \
-          'select th.id_theme, theme_number, th.descr, tft.count_question, tft.count_success, ' \
-          'case when correctly=\'Y\' then 1 else 0 end true_result, ' \
-          'case when correctly != \'Y\' then 1 else 0 end false_result ' \
-          'from questions_for_testing qft, answers a, ' \
-          'themes_for_testing tft, themes th ' \
-          'where qft.id_registration=tft.id_registration ' \
-          'and qft.id_theme=th.id_theme ' \
-          'and a.id_answer(+) = qft.id_answer ' \
-          'and tft.id_registration = :id ' \
-          'and tft.id_theme = th.id_theme ' \
-          ') ' \
-          'group by theme_number, count_question, count_success, descr ' \
-          'order by theme_number'
+    cmd = 'select * from ( ' \
+          '  select theme_number, theme_name, count_question, true_score, false_score ' \
+          '  from ( ' \
+          '    select theme_number, theme_name, count_question, ' \
+          '           sum(true_result) true_score, sum(false_result) false_score ' \
+          '    from ( ' \
+          '       select theme_number, to_char(th.descr) theme_name, tft.count_question, tft.count_success, ' \
+          '              case when correctly=\'Y\' then 1 else 0 end true_result, ' \
+          '              case when correctly != \'Y\' then 1 else 0 end false_result ' \
+          '       from questions_for_testing qft, answers a, themes_for_testing tft, themes th ' \
+          '       where qft.id_registration=tft.id_registration ' \
+          '       and qft.id_theme=th.id_theme ' \
+          '       and a.id_answer(+) = qft.id_answer ' \
+          '       and tft.id_registration = :id ' \
+          '       and tft.id_theme = th.id_theme ' \
+          '    ) ' \
+          '    group by theme_number, count_question, count_success, descr ' \
+          '  ) ' \
+          '  union ' \
+          '  select theme_number, theme_name, count(id_question_for_testing), count_question, ' \
+          '         sum(true_result) true_score, sum(false_result) false_score ' \
+          '  from ( ' \
+          '      select 100 theme_number, \'Итого: \' as  theme_name, qft.id_question_for_testing, tft.count_success, ' \
+          '             case when correctly=\'Y\' then 1 else 0 end true_result, ' \
+          '             case when correctly != \'Y\' then 1 else 0 end false_result ' \
+          '      from questions_for_testing qft, answers a, themes_for_testing tft, themes th ' \
+          '      where qft.id_registration=tft.id_registration ' \
+          '      and qft.id_theme=th.id_theme ' \
+          '      and a.id_answer(+) = qft.id_answer ' \
+          '      and tft.id_registration = tft.id_registration ' \
+          '      and tft.id_theme = th.id_theme ' \
+          '   ) ' \
+          '   group by(theme_number, theme_name) ' \
+          ' ) order by 1'
     cursor.execute(cmd, [id_registration])
     cursor.rowfactory = ResultF
     return cursor

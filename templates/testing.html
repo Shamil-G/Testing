@@ -5,7 +5,13 @@
 {% endblock %}
 
 {% block main_title %}
-    <h1 class="title">{{ theme }}</h1>
+    <h1 class="title">{{ theme_name }}</h1>
+{% endblock %}
+
+{% block checking_title %}
+   {% if status_testing == 'Проверка' %}
+        {{ res_value('CHECKING') }}
+   {% endif %}
 {% endblock %}
 
 {% block timer_area %}
@@ -36,12 +42,14 @@
 {% endblock %}
 
 {% block all_command %}
+   {% if status_testing != 'Проверка' %}
     <a class="bt_command nav"  href="/testing/0">{{ res_value('FIRST_QUESTION') }}</a>
     <a class="bt_command nav"  href="/testing/1">{{ res_value('FIRST_PART_QUESTION') }}</a>
     <a class="bt_command nav"  href="/testing/2">{{ res_value('PREV_QUESTION') }}</a>
     <a class="bt_command nav"  href="/testing/12">{{ res_value('NEXT_QUESTION') }}</a>
     <a class="bt_command nav"  href="/testing/11">{{ res_value('LAST_PART_QUESTION') }}</a>
     <a class="bt_command nav"  href="/testing/10">{{ res_value('LAST_QUESTION') }}</a>
+   {% endif %}
 {% endblock %}
 
 {% block body %}

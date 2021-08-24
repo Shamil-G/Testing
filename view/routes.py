@@ -90,7 +90,9 @@ def view_test():
         print("+++ Testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username + ', remain_time: ' + str(g.user.remain_time))
     if g.user.remain_time == 0:
         return redirect(url_for('view_result'))
-    return render_template("testing.html", remain_time=g.user.remain_time, theme=get_theme(), questions=get_quest(), answers=get_answers())
+    theme_name, status_testing = get_theme()
+    return render_template("testing.html", remain_time=g.user.remain_time, theme_name=theme_name,
+                           status_testing=status_testing, questions=get_quest(), answers=get_answers())
 
 
 @app.route('/testing/<int:command>')
