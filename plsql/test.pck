@@ -5,7 +5,8 @@ create or replace package test is
   -- Purpose : Процедура тестирования
   
   -- Public type declarations
-  function get_theme(iid_person in number) return nvarchar2;
+  procedure get_theme(iid_person in number, otheme_name out nvarchar2, ostatus_testing out nvarchar2);
+  
   function navigate_question(iid_person in number, icommand in number) return number;
   procedure set_answer(iid_person in number, iorder_num_answer in number);
 
@@ -36,20 +37,17 @@ create or replace package body test is
     insert into protocol(event_date, message) values(systimestamp, imess);
     commit;
   end;
-  
-  function get_theme(iid_person in number) return nvarchar2
+
+  procedure get_theme(iid_person in number, otheme_name out nvarchar2, ostatus_testing out nvarchar2)
   is
-  omess nvarchar2(128);
   begin
-    select th.descr
-    into omess
+    select th.descr, t.status_testing
+    into otheme_name, ostatus_testing
     from themes th, 
          testing t
     where th.id_theme=t.id_current_theme
     and t.status='Active'
     and t.id_person=iid_person;
-    
-    return omess;
   end;
   
   procedure set_answer(iid_person in number, iorder_num_answer in number)
@@ -88,7 +86,7 @@ create or replace package body test is
       raise_application_error(-20000, sqlerrm);
   end;
   
-  function next_theme(iid_person in number, icommand in number, iid_registration in pls_integer, itheme_number in pls_integer) return pls_integer
+  function next_theme(icommand in number, iid_registration in pls_integer, itheme_number in pls_integer) return pls_integer
   is
     row_tft         themes_for_testing%rowtype;
   begin
@@ -295,7 +293,7 @@ create or replace package body test is
     if icommand=12 then
       
        if v_cur_num_question=v_count_question then
-          if next_theme(iid_person, icommand, v_id_registration, v_theme_number)=-100 then
+          if next_theme(icommand, v_id_registration, v_theme_number)=-100 then
               log('2. ABSENT NEXT THEME. navigate_question. id_person: '||iid_person||' : '||icommand||' id_registration: '||v_id_registration||
                       ', theme_number: '||v_theme_number||', num_question: '||v_cur_num_question||', time remain: '||v_remain_time);
             return -100;
@@ -310,7 +308,7 @@ create or replace package body test is
     /* Предыдущий вопрос */
     if icommand=2 then
        if v_cur_num_question=1 then
-         if next_theme(iid_person, icommand, v_id_registration, v_theme_number)=-50 then
+         if next_theme(icommand, v_id_registration, v_theme_number)=-50 then
            return -50;
          end if;
        else
