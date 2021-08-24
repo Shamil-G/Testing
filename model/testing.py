@@ -18,11 +18,13 @@ class AnswerF(object):
 
 
 class ResultF(object):
-    def __init__(self, theme_number, theme_name, count_question, count_success, true_score, false_score):
+    def __init__(self, theme_number, theme_name, count_question,
+                 # count_success,
+                 true_score, false_score):
         self.theme_number = theme_number
         self.theme_name = theme_name
         self.count_question = count_question
-        self.count_success = count_success
+        # self.count_success = count_success
         self.true_score = true_score
         self.false_score = false_score
 
@@ -175,10 +177,10 @@ def get_result(id_registration):
           '       and tft.id_registration = :id ' \
           '       and tft.id_theme = th.id_theme ' \
           '    ) ' \
-          '    group by theme_number, count_question, count_success, descr ' \
+          '    group by theme_number, count_question, count_success, theme_name ' \
           '  ) ' \
           '  union ' \
-          '  select theme_number, theme_name, count(id_question_for_testing), count_question, ' \
+          '  select theme_number, theme_name, count(id_question_for_testing) count_question, ' \
           '         sum(true_result) true_score, sum(false_result) false_score ' \
           '  from ( ' \
           '      select 100 theme_number, \'Итого: \' as  theme_name, qft.id_question_for_testing, tft.count_success, ' \
@@ -188,11 +190,11 @@ def get_result(id_registration):
           '      where qft.id_registration=tft.id_registration ' \
           '      and qft.id_theme=th.id_theme ' \
           '      and a.id_answer(+) = qft.id_answer ' \
-          '      and tft.id_registration = tft.id_registration ' \
+          '      and tft.id_registration = :id ' \
           '      and tft.id_theme = th.id_theme ' \
           '   ) ' \
           '   group by(theme_number, theme_name) ' \
           ' ) order by 1'
-    cursor.execute(cmd, [id_registration])
+    cursor.execute(cmd, [id_registration, id_registration])
     cursor.rowfactory = ResultF
     return cursor

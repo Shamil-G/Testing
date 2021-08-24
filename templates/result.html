@@ -57,7 +57,11 @@
             <tbody>
         {% for el in cursor %}
             <tr>
+                {% if el.theme_number!=100 %}
              <td><a class="title2">{{ el.theme_number }}</a></td>
+                {% else %}
+             <td><a class="title2"></a></td>
+                {% endif %}
              <td style="text-align: left"><a class="title2">{{ el.theme_name }}</a></td>
              <td><a class="title2">{{ el.count_question }}</a></td>
 <!--             <td><a class="title2">{{ el.count_success }}</a></td>-->
