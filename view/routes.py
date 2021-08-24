@@ -60,7 +60,7 @@ def view_models():
 def view_finish():
     if cfg.debug_level > 1:
         print("VIEW FINISH. Finish testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username)
-    return render_template("finish.html")
+    return render_template("finish.html", message='')
 
 
 @app.route('/finish-approve')
@@ -80,7 +80,7 @@ def view_finish_part():
     if mess != '':
         flash(mess)
     #     return redirect(url_for('view_result'))
-    return render_template("finish.html")
+    return render_template("finish.html", message=mess)
 
 
 @app.route('/testing')
