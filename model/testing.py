@@ -141,24 +141,42 @@ def get_answers():
     return cursor
 
 
-def get_result_info():
-    if cfg.debug_level > 2:
-        print('Get Result Info: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
+# def get_result_info():
+#     if cfg.debug_level > 2:
+#         print('Get Result Info: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
+#     con = get_connection()
+#     cursor = con.cursor()
+#     id_reg = cursor.var(cx_Oracle.DB_TYPE_NUMBER)
+#     iin = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
+#     time_beg = cursor.var(cx_Oracle.DB_TYPE_DATE)
+#     time_end = cursor.var(cx_Oracle.DB_TYPE_DATE)
+#     fio = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
+#     cursor.callproc('test.get_personal_info', (g.user.id_user, id_reg, iin, time_beg, time_end, fio))
+#     print('Got result info ' + fio.getvalue() + ', time_end: ' + str(time_end.getvalue()))
+#     return id_reg.getvalue(), iin.getvalue(), time_beg.getvalue(), time_end.getvalue(), fio.getvalue()
+
+
+def get_result_info(id_reg):
+    if cfg.debug_level > 3:
+        print('Get Result Info: ' + str(id_reg) )
     con = get_connection()
     cursor = con.cursor()
-    id_reg = cursor.var(cx_Oracle.DB_TYPE_NUMBER)
     iin = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
     time_beg = cursor.var(cx_Oracle.DB_TYPE_DATE)
     time_end = cursor.var(cx_Oracle.DB_TYPE_DATE)
     fio = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
-    cursor.callproc('test.get_personal_info', (g.user.id_user, id_reg, iin, time_beg, time_end, fio))
-    print('Got result info ' + fio.getvalue() + ', time_end: ' + str(time_end.getvalue()))
-    return id_reg.getvalue(), iin.getvalue(), time_beg.getvalue(), time_end.getvalue(), fio.getvalue()
+    cursor.callproc('test.get_personal_info', (id_reg, iin, time_beg, time_end, fio))
+    if cfg.debug_level > 1 and iin.getvalue() != '':
+        print('Got result info ' + str(iin.getvalue()))
+    if iin != '':
+        return id_reg, iin.getvalue(), time_beg.getvalue(), time_end.getvalue(), fio.getvalue()
+    else:
+        return id_reg, '', '', '', ''
 
 
 def get_result(id_registration):
     if cfg.debug_level > 2:
-        print('Get answer for: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
+        print('Get result for: ' + str(id_registration))
     con = get_connection()
     cursor = con.cursor()
     cmd = 'select * from ( ' \

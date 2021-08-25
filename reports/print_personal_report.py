@@ -7,14 +7,23 @@ import os.path
 #import win32print
 from datetime import date, timedelta
 
+module_result_path = ''
+
 
 def print_result_test(id_registration):
+    print('++++ print_result_test: ' + str(id_registration))
     now = datetime.datetime.now()
     # today = datetime.date.today()
-    id_reg, iin, time_beg, time_end, fio = get_result_info()
+    id_reg, iin, time_beg, time_end, fio = get_result_info(id_registration)
+
+    if iin is None:
+        return ''
 
     file_name = 'result ' + str(id_reg) + '.xlsx'
-    file_path = cfg.REPORTS_PATH + file_name
+    if not module_result_path:
+        file_path = cfg.REPORTS_PATH + file_name
+    else:
+        file_path = module_result_path + file_name
 
     if os.path.isfile(file_path):
         return file_name
@@ -32,7 +41,7 @@ def print_result_test(id_registration):
 
     cursor = get_result(id_registration)
 
-    print("Провели расчет и формируем Excel: " + datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
+    # print("Провели расчет и формируем Excel: " + datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
 
     title1_cell_format = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'size': 18})
     worksheet.merge_range('B1:H1', "", title1_cell_format)
@@ -56,7 +65,7 @@ def print_result_test(id_registration):
     common_format_2.set_align('vcenter')
     common_format_2.set_text_wrap()
     sum_pay_format = workbook.add_format({'num_format': '#,###,##0.00', 'font_color': 'black', 'align': 'vcenter'})
-    #date_format = workbook.add_format({'num_format':'dd/mm/yy', 'align': 'vcenter'})
+    # date_format = workbook.add_format({'num_format':'dd/mm/yy', 'align': 'vcenter'})
 
     worksheet.write('B1', 'РЕЗУЛЬТАТЫ ТЕСТИРОВАНИЯ', title1_cell_format)
     worksheet.write('B2', fio, title2_cell_format)
@@ -76,18 +85,25 @@ def print_result_test(id_registration):
     worksheet.write('B8', '№', common_format_2)
     worksheet.write('C8', 'Задание', common_format_2)
     worksheet.write('E8', 'Вопросов', common_format_2)
-    worksheet.write('F8', 'Порог', common_format_2)
-    worksheet.write('G8', 'Верных ответов', common_format_2)
-    worksheet.write('H8', 'Ошибок', common_format_2)
+    # worksheet.write('F8', 'Порог', common_format_2)
+    # worksheet.write('G8', 'Верных ответов', common_format_2)
+    # worksheet.write('H8', 'Ошибок', common_format_2)
+    worksheet.write('F8', 'Верных ответов', common_format_2)
+    worksheet.write('G8', 'Ошибок', common_format_2)
     row = 0
     for record in cursor:
         merge_format = 'C'+str(row+8+1)+':D'+str(row+8+1) + ''
 
         worksheet.merge_range(merge_format, "", theme_name_format)
-        worksheet.write(row + 8, 1, record.theme_number, common_format)
+        if record.theme_number != 100:
+            worksheet.write(row + 8, 1, record.theme_number, common_format)
+        else:
+            worksheet.write(row + 8, 1, None, common_format)
         worksheet.write(row + 8, 2, record.theme_name, theme_name_format)
         worksheet.write(row + 8, 4, record.count_question, common_format)
-        worksheet.write(row + 8, 5, record.count_success, common_format)
+        # worksheet.write(row + 8, 5, record.count_success, common_format)
+        # worksheet.write(row + 8, 6, record.true_score, common_format)
+        # worksheet.write(row + 8, 7, record.false_score, common_format)
         worksheet.write(row + 8, 5, record.true_score, common_format)
         worksheet.write(row + 8, 6, record.false_score, common_format)
         row += 1
@@ -95,7 +111,7 @@ def print_result_test(id_registration):
     worksheet.write(row + 8 + 1, 1, now.strftime("%d.%m.%Y %H:%M:%S"))
     workbook.close()
 
-    print("Завершен расчет: " + datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
+    # print("Завершен расчет: " + datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
     if cfg.print_at_once:
        None
 #        my_printer = win32print.GetDefaultPrinter()
@@ -108,3 +124,10 @@ def print_result_test(id_registration):
 #            0
 #        )
     return file_name
+
+
+if __name__ == "__main__":
+    module_result_path = './'
+    my_id_reg = 1022
+    print('Testing app Print Result for: ' + str(my_id_reg))
+    print_result_test(my_id_reg)
