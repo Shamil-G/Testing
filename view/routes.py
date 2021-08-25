@@ -1,7 +1,7 @@
 from flask import render_template, flash, request, redirect, g
 from flask_login import LoginManager, login_required, logout_user, login_user, current_user
 from db_oracle.UserLogin import User
-from reports.print_result_test import print_result_test
+from reports.print_personal_report import print_result_test
 from model.utils import *
 from model.testing import *
 from main_app import app
