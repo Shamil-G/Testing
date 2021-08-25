@@ -47,7 +47,10 @@ def get_theme():
     status_testing = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
     cursor.callproc('test.get_theme', (g.user.id_user, theme_name, status_testing))
     if cfg.debug_level > 2:
-        print('Got theme info ' + theme_name.getvalue() + ', status_testing: ' + status_testing.getvalue())
+        if status_testing.getvalue():
+            print('Got theme. theme_name: ' + theme_name.getvalue() + ', status_testing: ' + status_testing.getvalue())
+        else:
+            print('Got theme. theme_name: ' + theme_name.getvalue())
     return theme_name.getvalue(), status_testing.getvalue()
 
 
@@ -141,24 +144,25 @@ def get_answers():
     return cursor
 
 
-# def get_result_info():
-#     if cfg.debug_level > 2:
-#         print('Get Result Info: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
-#     con = get_connection()
-#     cursor = con.cursor()
-#     id_reg = cursor.var(cx_Oracle.DB_TYPE_NUMBER)
-#     iin = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
-#     time_beg = cursor.var(cx_Oracle.DB_TYPE_DATE)
-#     time_end = cursor.var(cx_Oracle.DB_TYPE_DATE)
-#     fio = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
-#     cursor.callproc('test.get_personal_info', (g.user.id_user, id_reg, iin, time_beg, time_end, fio))
-#     print('Got result info ' + fio.getvalue() + ', time_end: ' + str(time_end.getvalue()))
-#     return id_reg.getvalue(), iin.getvalue(), time_beg.getvalue(), time_end.getvalue(), fio.getvalue()
+def get_result_info_html():
+    if cfg.debug_level > 3:
+        print('Get Result Info: ' + str(g.user.id_user) + ' : ' + str(g.user.username))
+    con = get_connection()
+    cursor = con.cursor()
+    id_reg = cursor.var(cx_Oracle.DB_TYPE_NUMBER)
+    iin = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
+    time_beg = cursor.var(cx_Oracle.DB_TYPE_DATE)
+    time_end = cursor.var(cx_Oracle.DB_TYPE_DATE)
+    fio = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
+    cursor.callproc('test.get_personal_info', (g.user.id_user, id_reg, iin, time_beg, time_end, fio))
+    if cfg.debug_level > 2:
+        print('Get result info. ID_REG: ' + str(id_reg.getvalue()) + ', IIN: ' + str(iin.getvalue()) + ', time_beg: ' + str(time_beg.getvalue()))
+    return id_reg.getvalue(), iin.getvalue(), time_beg.getvalue(), time_end.getvalue(), fio.getvalue()
 
 
 def get_result_info(id_reg):
     if cfg.debug_level > 3:
-        print('Get Result Info: ' + str(id_reg) )
+        print('Get Result Info: ' + str(id_reg))
     con = get_connection()
     cursor = con.cursor()
     iin = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
@@ -166,11 +170,11 @@ def get_result_info(id_reg):
     time_end = cursor.var(cx_Oracle.DB_TYPE_DATE)
     fio = cursor.var(cx_Oracle.DB_TYPE_NVARCHAR)
     cursor.callproc('test.get_personal_info', (id_reg, iin, time_beg, time_end, fio))
-    if cfg.debug_level > 1 and iin.getvalue() != '':
-        print('Got result info ' + str(iin.getvalue()))
-    if iin != '':
+    if cfg.debug_level > 3 and iin and iin.getvalue():
+        print('Get result info. ID_REG: ' + str(id_reg) + ', IIN: ' + str(iin.getvalue()) + ', time_beg: ' + str(time_beg.getvalue()))
         return id_reg, iin.getvalue(), time_beg.getvalue(), time_end.getvalue(), fio.getvalue()
-    else:
+    if cfg.debug_level > 3 and not iin:
+        print('Get result info. ID_REG: ' + str(id_reg) + ', IIN: ' + str(iin.getvalue()) + ', time_beg: ' + str(time_beg.getvalue()))
         return id_reg, '', '', '', ''
 
 

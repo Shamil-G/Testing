@@ -125,12 +125,12 @@ def view_save_answer(order_num_answer):
 @login_required
 def view_result():
     finish()
-    id_reg, iin, time_beg, time_end, fio = get_result_info()
+    id_reg, iin, time_beg, time_end, fio = get_result_info_html()
     ft_beg = time_beg.strftime('%d.%m.%Y  %H:%M:%S')
     ft_end = time_end.strftime('%d.%m.%Y  %H:%M:%S')
     # В печатном виде отчет не выдавать
     # result_file = print_result_test(id_reg)
-    if cfg.debug_level > 1:
+    if cfg.debug_level > 2:
         print("+++ VIEW RESULT. Id REG: "+str(id_reg)+" : " + fio + ', remain_time: ' + str(ft_end))
     return render_template("result.html", fio=fio, iin=iin, id_reg=id_reg, time_beg=ft_beg, time_end=ft_end,  cursor=get_result(id_reg))
     # return render_template("result.html", result_file=result_file, fio=fio, iin=iin, id_reg=id_reg, time_beg=ft_beg, time_end=ft_end,  cursor=get_result(id_reg))
