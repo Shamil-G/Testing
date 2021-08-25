@@ -42,7 +42,15 @@
 {% endblock %}
 
 {% block all_command %}
-   {% if status_testing != 'Проверка' %}
+   {% if status_testing == 'Проверка' %}
+    <a class="bt_command nav"  href="/finish/part">{{ res_value('TEST_OVER') }}</a>
+   {% elif status_testing == 'Полная проверка' %}
+    <a class="bt_command nav"  href="/testing/0">{{ res_value('FIRST_QUESTION') }}</a>
+    <a class="bt_command nav"  href="/testing/2">{{ res_value('PREV_QUESTION') }}</a>
+    <a class="bt_command nav"  href="/testing/12">{{ res_value('NEXT_QUESTION') }}</a>
+    <a class="bt_command nav"  href="/testing/10">{{ res_value('LAST_QUESTION') }}</a>
+    <a class="bt_command nav"  href="/finish/part">{{ res_value('TEST_OVER') }}</a>
+   {% else %}
     <a class="bt_command nav"  href="/testing/0">{{ res_value('FIRST_QUESTION') }}</a>
     <a class="bt_command nav"  href="/testing/1">{{ res_value('FIRST_PART_QUESTION') }}</a>
     <a class="bt_command nav"  href="/testing/2">{{ res_value('PREV_QUESTION') }}</a>

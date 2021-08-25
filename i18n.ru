@@ -1,6 +1,7 @@
 APP_NAME = Тестирование
 CHECKING = ПРОВЕРКА РЕЗУЛЬТАТОВ, ОТВЕЧАЙТЕ НА ВСЕ ВОПРОСЫ
 FINISH = Завершить тест
+TEST_OVER = << Завершить >>
 FINISH_TESTING = Завершение тестирования
 FIRST_PART_QUESTION = <<  В начало раздела
 FIRST_QUESTION = <<<  В начало
@@ -28,3 +29,4 @@ COUNT_FOR_SUCCESS = Порог
 COUNT_TRUE = Отвечено верно
 COUNT_FALSE = Ошибок
 USER_IDENTIFY = ИИН
+HAVING_UNANSWERED_QUESTIONS = Неотвеченных вопросов

@@ -21,3 +21,4 @@ COUNT_TRUE = Верных ответов
 COUNT_FALSE = Ошибок
 PRINT_RESULT = Печатать
 EXIT = Завершить тестирование
+HAVING_UNANSWERED_QUESTIONS = Неотвеченных вопросов:
