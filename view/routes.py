@@ -9,7 +9,6 @@ from main_app import app
 import cx_Oracle
 import config as cfg
 
-
 if cfg.debug_level > 0:
     print("Routes стартовал...")
 
@@ -50,7 +49,7 @@ def view_models():
             errorObj, = e.args
             print("Error Code:", errorObj.code)
             print("Error Message:", errorObj.message)
-            print("Ошибка при регистрации в системе "+str(username))
+            print("Ошибка при регистрации в системе " + str(username))
             return redirect("/")
     return render_template("login_page.html")
 
@@ -59,7 +58,7 @@ def view_models():
 @login_required
 def view_finish():
     if cfg.debug_level > 1:
-        print("VIEW FINISH. Finish testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username)
+        print("VIEW FINISH. Finish testing show page. Id user: " + str(g.user.id_user) + " : " + g.user.username)
     return render_template("finish.html", message='')
 
 
@@ -67,7 +66,7 @@ def view_finish():
 @login_required
 def view_finish_approve():
     if cfg.debug_level > 1:
-        print("VIEW FINISH. Finish testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username)
+        print("VIEW FINISH. Finish testing show page. Id user: " + str(g.user.id_user) + " : " + g.user.username)
     return render_template("finish-approve.html")
 
 
@@ -75,7 +74,7 @@ def view_finish_approve():
 @login_required
 def view_finish_part():
     if cfg.debug_level > 3:
-        print("VIEW FINISH PART. Finish testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username)
+        print("VIEW FINISH PART. Finish testing show page. Id user: " + str(g.user.id_user) + " : " + g.user.username)
     mess = finish_info()
     if mess != '':
         flash(mess)
@@ -87,7 +86,8 @@ def view_finish_part():
 @login_required
 def view_test():
     if cfg.debug_level > 3:
-        print("+++ Testing show page. Id user: "+str(g.user.id_user)+" : "+g.user.username + ', remain_time: ' + str(g.user.remain_time))
+        print("+++ Testing show page. Id user: " + str(
+            g.user.id_user) + " : " + g.user.username + ', remain_time: ' + str(g.user.remain_time))
     if g.user.remain_time == 0:
         return redirect(url_for('view_result'))
     theme_name, status_testing = get_theme()
@@ -99,8 +99,9 @@ def view_test():
 @login_required
 def view_change_question(command):
     g.user.remain_time = navigate_question(command)
-    if cfg.debug_level > 3:
-        print("Change question. Id user: "+str(g.user.id_user)+" : "+str(command) + ', remain_time: ' + str(g.user.remain_time))
+    if cfg.debug_level > 2:
+        print("Change question. Id user: " + str(g.user.id_user) + " : " + str(command) + ', remain_time: ' + str(
+            g.user.remain_time))
     # Время истекло полностью на все темы
     if int(g.user.remain_time) == 0:
         return redirect(url_for('view_result'))
@@ -113,10 +114,10 @@ def view_change_question(command):
 @app.route('/testing/save/<int:order_num_answer>')
 @login_required
 def view_save_answer(order_num_answer):
-    if cfg.debug_level > 3:
-        print("Save answer. Id user: "+str(g.user.id_user)+" : "+str(order_num_answer))
+    if cfg.debug_level > 2:
+        print("Save answer. Id user: " + str(g.user.id_user) + " : " + str(order_num_answer))
     save_answer(order_num_answer)
-    if cfg.move_at_once and cfg.move_at_once == 'False':
+    if cfg.move_at_once is False:
         return redirect(url_for('view_change_question', command=1024))
     return redirect(url_for('view_change_question', command=12))
 
@@ -131,6 +132,7 @@ def view_result():
     # В печатном виде отчет не выдавать
     # result_file = print_result_test(id_reg)
     if cfg.debug_level > 2:
-        print("+++ VIEW RESULT. Id REG: "+str(id_reg)+" : " + fio + ', remain_time: ' + str(ft_end))
-    return render_template("result.html", fio=fio, iin=iin, id_reg=id_reg, time_beg=ft_beg, time_end=ft_end,  cursor=get_result(id_reg))
+        print("+++ VIEW RESULT. Id REG: " + str(id_reg) + " : " + fio + ', remain_time: ' + str(ft_end))
+    return render_template("result.html", fio=fio, iin=iin, id_reg=id_reg, time_beg=ft_beg, time_end=ft_end,
+                           cursor=get_result(id_reg))
     # return render_template("result.html", result_file=result_file, fio=fio, iin=iin, id_reg=id_reg, time_beg=ft_beg, time_end=ft_end,  cursor=get_result(id_reg))
